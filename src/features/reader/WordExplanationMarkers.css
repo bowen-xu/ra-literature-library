@@ -1,0 +1,7 @@
+.word-explanation-marker { position: absolute; z-index: 4; padding: 0; border: 0; border-bottom: 1px dashed #657b69; border-radius: 0; background: transparent; cursor: pointer; pointer-events: auto; }
+.word-explanation-marker:hover { background: #657b6912; }
+.word-explanation-detail { padding: 10px; color: #303b34; }
+.word-explanation-detail > header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-size: var(--ui-font-caption); }
+.word-explanation-heading { display: flex; align-items: center; gap: 4px; }
+.word-explanation-detail > header button { display: grid; place-items: center; width: 24px; height: 24px; padding: 3px; border: 0; border-radius: 4px; background: transparent; color: #526454; cursor: pointer; }
+.word-explanation-detail > header button:hover { background: #e9eee7; }

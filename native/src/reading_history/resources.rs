@@ -1,0 +1,24 @@
+pub fn static_sql() -> [(&'static str, &'static str); 5] {
+    [
+        (
+            "reading-history-session-list.v1.sql",
+            include_str!("../../data/reading-history-session-list.v1.sql"),
+        ),
+        (
+            "reading-history-session-archive.v1.sql",
+            include_str!("../../data/reading-history-session-archive.v1.sql"),
+        ),
+        (
+            "reading-history-session-turns.v1.sql",
+            include_str!("../../data/reading-history-session-turns.v1.sql"),
+        ),
+        (
+            "reading-history-turn-debug.v1.sql",
+            include_str!("../../data/reading-history-turn-debug.v1.sql"),
+        ),
+        (
+            "reading-history-bootstrap-attachments.v1.sql",
+            include_str!("../../data/reading-history-bootstrap-attachments.v1.sql"),
+        ),
+    ]
+}

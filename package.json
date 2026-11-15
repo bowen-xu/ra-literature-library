@@ -1,0 +1,65 @@
+{
+  "name": "@research-assistant/literature-library-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./workspace": "./src/public/workspace.ts",
+    "./manifest": "./src/public/manifest.ts",
+    "./configuration": "./src/public/configuration.ts",
+    "./navigation": "./src/public/navigation.ts",
+    "./research": "./src/public/research.ts",
+    "./runtimeAdapters": "./src/public/runtimeAdapters.ts",
+    "./paperPreparation": "./src/public/paperPreparation.ts",
+    "./researchExport": "./src/public/researchExport.ts",
+    "./literatureGateway": "./src/public/literatureGateway.ts",
+    "./collectionGateway": "./src/public/collectionGateway.ts",
+    "./knowledgeGateway": "./src/public/knowledgeGateway.ts",
+    "./evidenceGateway": "./src/public/evidenceGateway.ts",
+    "./evidenceMatrixGateway": "./src/public/evidenceMatrixGateway.ts",
+    "./derivedViewGateway": "./src/public/derivedViewGateway.ts",
+    "./referenceRecordGateway": "./src/public/referenceRecordGateway.ts",
+    "./transportDecoders": "./src/public/transportDecoders.ts",
+    "./bibliography": "./src/public/bibliography.ts",
+    "./contracts/literatureGateway": "./src/public/contracts/literatureGateway.ts",
+    "./contracts/knowledgeGateway": "./src/public/contracts/knowledgeGateway.ts",
+    "./contracts/evidenceGateway": "./src/public/contracts/evidenceGateway.ts",
+    "./contracts/evidenceMatrixGateway": "./src/public/contracts/evidenceMatrixGateway.ts",
+    "./contracts/derivedViewGateway": "./src/public/contracts/derivedViewGateway.ts",
+    "./contracts/referenceRecordGateway": "./src/public/contracts/referenceRecordGateway.ts",
+    "./contracts/researchExportGateway": "./src/public/contracts/researchExportGateway.ts"
+  },
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ariakit/react": "0.4.35",
+    "@research-assistant/core": "workspace:*",
+    "@research-assistant/data": "workspace:*",
+    "@research-assistant/workbench-sdk": "workspace:*",
+    "katex": "0.18.1",
+    "lucide-react": "1.28.0",
+    "pdfjs-dist": "6.1.200",
+    "react-markdown": "10.1.0",
+    "rehype-katex": "7.0.1",
+    "remark-gfm": "4.0.1",
+    "remark-math": "6.0.0"
+  },
+  "peerDependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@codemirror/state": "6.7.1",
+    "@codemirror/view": "6.43.7",
+    "@tauri-apps/api": "2.11.1",
+    "@types/node": "25.0.3",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.1",
+    "typescript": "5.9.3",
+    "vite": "8.2.0"
+  }
+}
