@@ -1,0 +1,20 @@
+// Fixed artifact inputs. Core separately accepts exact SQL grants and codecs.
+export const literatureAttachmentResources = Object.freeze([
+  "attachment-active-parent.v1.sql",
+  "attachment-same-item-hash.v1.sql",
+  "attachment-insert.v1.sql",
+  "attachment-other-items.v1.sql",
+  "attachment-rename.v1.sql",
+  "attachment-remove-header.v1.sql",
+  "attachment-content-path.v1.sql",
+  "attachment-remove-delete.v1.sql",
+  "attachment-remove-fts.v1.sql",
+  "attachment-reading-state-save.v1.sql",
+  "attachment-reading-state-get.v1.sql",
+  "attachment-is-indexed.v1.sql",
+  "attachment-index-job-running.v1.sql",
+  "attachment-index-pages-delete.v1.sql",
+  "attachment-index-page-insert.v1.sql",
+  "attachment-index-fts.v1.sql",
+  "attachment-index-job-completed.v1.sql",
+]);

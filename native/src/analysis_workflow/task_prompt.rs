@@ -1,5 +1,5 @@
 //! Canonical original task rendering over Core-classified immutable sources.
-use research_agent_core::{
+use research_agent_api::{
     prompt_template::Template,
     submission::ContextText,
     user_input::{MentionTarget, TextElement, UserInput},
@@ -88,8 +88,8 @@ pub fn render_templates<'a>(
                 ..
             } = &resource
             {
-                research_agent_core::text_patch::address::object(
-                    research_agent_core::text_patch::address::SourceRoot::Library,
+                research_agent_api::text_patch::address::object(
+                    research_agent_api::text_patch::address::SourceRoot::Library,
                     &[resource_id.clone(), id.clone()],
                 )
             } else {

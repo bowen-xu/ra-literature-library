@@ -109,7 +109,7 @@ fn legacy_attempt_prompt_keeps_only_task_messages_and_preserves_original_text() 
     assert_eq!(prompt.text, " first Ω\n\n\nsecond");
     assert_eq!(
         prompt.user_input,
-        vec![research_agent_core::user_input::UserInput::Text {
+        vec![research_agent_api::user_input::UserInput::Text {
             text: prompt.text,
             text_elements: vec![]
         }]

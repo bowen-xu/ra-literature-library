@@ -1,5 +1,5 @@
 //! A frozen paper is one material; retain block identities inside its source bundle.
-use research_agent_core::submission::{ContextSourceKind, ContextText};
+use research_agent_api::submission::{ContextSourceKind, ContextText};
 use research_workbench_native_sdk::analysis_workflow::AnalysisWorkflowError as AiError;
 use sha2::{Digest, Sha256};
 

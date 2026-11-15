@@ -1,5 +1,5 @@
 use super::*;
-use research_agent_core::submission::{ContextSourceKind, ContextText};
+use research_agent_api::submission::{ContextSourceKind, ContextText};
 use research_workbench_native_sdk::{
     analysis_workflow::wire::*,
     catalog::{CatalogInput, CatalogOperation, CatalogOutput},

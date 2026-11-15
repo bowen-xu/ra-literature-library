@@ -1,6 +1,6 @@
 //! Original Docling overview prompt over owned profile, quotes and image data.
 use super::docling::context_for_item;
-use research_agent_core::prompt_template::Template;
+use research_agent_api::prompt_template::Template;
 use research_workbench_native_sdk::{
     analysis_workflow::{AnalysisWorkflowError as AiError, docling::DoclingPromptInputV1},
     generation::provider::{ProviderImage, ProviderInput, ProviderMessage, ProviderMessageRole},
@@ -135,7 +135,7 @@ pub fn build_overview_input(input: &DoclingPromptInputV1) -> Result<ProviderInpu
 #[cfg(test)]
 mod prompt_template_tests {
     use super::{PROFILE_PROMPT, TEMPLATE_PROMPT, render_overview_prompt};
-    use research_agent_core::prompt_template::Template;
+    use research_agent_api::prompt_template::Template;
 
     #[test]
     fn embedded_prompts_use_exact_bindings_and_preserve_literal_values() {

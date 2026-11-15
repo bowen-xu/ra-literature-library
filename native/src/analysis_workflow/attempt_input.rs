@@ -1,5 +1,5 @@
 //! Original legacy attempt text, without template, storage or Agent owners.
-use research_agent_core::user_input::UserInput;
+use research_agent_api::user_input::UserInput;
 use research_workbench_native_sdk::{
     analysis_history::contracts::{PaperAnalysisMessage, PaperAnalysisMessageKind},
     analysis_workflow::prompt::PaperTaskPrompt,

@@ -1,7 +1,7 @@
 //! Stdio adapter only; no process owner, SQL, clock or shared Core mutation.
 mod snapshot;
 
-use research_agent_core::mcp::FrameDecoder;
+use research_agent_api::mcp::FrameDecoder;
 use research_literature_library_native::retrieval_trace::validate_context;
 use research_workbench_native_sdk::{
     literature_trace_protocol::{

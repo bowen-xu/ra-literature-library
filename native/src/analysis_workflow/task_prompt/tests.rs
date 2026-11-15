@@ -1,5 +1,5 @@
 use super::*;
-use research_agent_core::submission::ContextSourceKind;
+use research_agent_api::submission::ContextSourceKind;
 use research_workbench_native_sdk::candidate_contracts::{
     AiOverviewProfileContext, PaperTemplateRef, PaperTemplateSnapshot, TemplateField,
 };
