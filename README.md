@@ -22,7 +22,12 @@ pnpm test:build
 pnpm build:test-support
 ```
 
-UI 测试消费 Workbench 已构建的 /sdk/v1/，沿用生产包相同的 external 路径映射。纯领域测试使用本工程夹具。涉及 Core 私有夹具或多个工程的回归由主仓库 tests/acceptance/ 执行。
+UI 测试消费 Workbench 已构建的 /sdk/v1/，沿用生产包相同的 external 路径映射。纯领域测试使用本工程夹具。
+Core 实现测试留在 Workbench，单插件协作测试消费公开 SDK、Native 协议或公开
+测试宿主，完整产品组合验收由父仓负责。
+
+`native/tests/` 保存候选、证据引用和长 PDF 页预算的公开契约回归。页预算夹具直接
+提供与原数据库夹具相同的公开观察 DTO，原有预算、排序与稳定身份断言保留。
 
 Native 依赖 SDK 的有限协议与 agent-api。测试支持源码产物用于 Core 的现有回归，由本工程单独打包并记录版本与完整性。
 
