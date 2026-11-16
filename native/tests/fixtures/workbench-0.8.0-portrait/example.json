@@ -1,0 +1,45 @@
+{
+  "kind": "paper_portrait_v1",
+  "schemaVersion": 1,
+  "coverage": "仅依据实际读取的 PDF 页及其结构化摘录；未读取部分不作判断。",
+  "claims": [
+    {
+      "id": "claim_1",
+      "dimension": "genre",
+      "label": "不确定",
+      "description": "该维度尚缺少足够证据，不能确定分类。",
+      "certainty": "uncertain",
+      "evidence": []
+    },
+    {
+      "id": "claim_2",
+      "dimension": "mode",
+      "label": "不确定",
+      "description": "该维度尚缺少足够证据，不能确定分类。",
+      "certainty": "uncertain",
+      "evidence": []
+    },
+    {
+      "id": "claim_3",
+      "dimension": "paradigm",
+      "label": "不确定",
+      "description": "该维度尚缺少足够证据，不能确定分类。",
+      "certainty": "uncertain",
+      "evidence": []
+    }
+  ],
+  "template": [
+    {
+      "id": "question",
+      "title": "研究问题",
+      "question": "研究回应什么问题、目标或需求？",
+      "claimIds": []
+    },
+    {
+      "id": "approach",
+      "title": "研究方法",
+      "question": "采用什么概念、形式模型、材料或构建方法？",
+      "claimIds": []
+    }
+  ]
+}
