@@ -199,3 +199,26 @@ fn workbench_0_8_0_portrait_skill_example_satisfies_domain_decoder() {
     )
     .expect("the versioned skill example satisfies the actual domain decoder");
 }
+
+#[test]
+fn workbench_0_8_0_provider_outputs_satisfy_domain_decoders() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures/workbench-0.8.0-provider-output");
+    let manifest: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(root.join("provenance.json")).unwrap())
+            .unwrap();
+    for fixture in manifest["fixtures"].as_array().unwrap() {
+        let value: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(root.join(fixture["file"].as_str().unwrap())).unwrap(),
+        )
+        .unwrap();
+        let keys = fixture["evidenceItemIds"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|key| key.as_str().unwrap().to_owned())
+            .collect();
+        let decoded = research_literature_library_native::analysis_workflow::candidate::decode_candidate_value(value.clone(), &keys).unwrap();
+        assert_eq!(decoded.kind(), value["kind"].as_str().unwrap());
+    }
+}
