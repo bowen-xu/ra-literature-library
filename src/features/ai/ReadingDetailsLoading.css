@@ -1,4 +1,0 @@
-.paper-reading-details-loading { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 180px; color: #717b73; font-size: var(--ui-font-label); }
-.paper-reading-loading-spinner { flex: none; animation: reading-details-spin .9s linear infinite; }
-@keyframes reading-details-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .paper-reading-loading-spinner { animation: none; } }

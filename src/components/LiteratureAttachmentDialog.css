@@ -1,5 +1,0 @@
-.literature-attachment-dialog { position: fixed; inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; box-sizing: border-box; padding: 22px; border: 1px solid #cbd2ca; border-radius: 12px; background: #faf9f5; color: #344039; box-shadow: 0 18px 60px #21372c30; }
-.literature-attachment-dialog h2 { margin: 0 0 18px; font-size: var(--ui-font-heading); }
-.literature-attachment-dialog label { display: grid; gap: 8px; font-size: var(--ui-font-label); }
-.literature-attachment-dialog input { min-width: 0; padding: 8px 10px; border: 1px solid #bdc7bd; border-radius: 6px; font-size: var(--ui-font-body); }
-.literature-attachment-dialog p { font-size: var(--ui-font-body); line-height: 1.6; overflow-wrap: anywhere; }
