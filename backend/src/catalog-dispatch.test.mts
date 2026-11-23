@@ -31,4 +31,6 @@ test('catalog dispatcher rejects unknown and not-yet-migrated operations explici
   assert.deepEqual(planned.result, {kind: 'search', ftsQuery: '{title creators} : "2026"*', year: 2026});
   const bibliography = dispatchCatalog({operation: 'bibliographySearch', input: {phase: 'prepare', query: ' DOI '}});
   assert.deepEqual(bibliography.result, {kind: 'needle', needle: '%doi%'});
+  const duplicates = dispatchCatalog({operation: 'projectDuplicateCandidates', input: {rows: [[{kind: 'text', value: 'id'}, {kind: 'text', value: 'left'}, {kind: 'text', value: 'Left'}, {kind: 'text', value: 'right'}, {kind: 'text', value: 'Right'}, {kind: 'text', value: 'reason'}, {kind: 'text', value: '0000000000000000'}]]}});
+  assert.equal((duplicates.result as any)[0].confidenceBits.asString(), '0000000000000000');
 });

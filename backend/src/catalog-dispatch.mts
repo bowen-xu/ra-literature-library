@@ -29,6 +29,8 @@ import {validateStructured, type StructuredValidationInput} from './structured-v
 import {validateEditableTemplate, type EditableTemplateInput} from './editable-template.mts';
 import {selectUnreviewedFields} from './review-selection.mts';
 import {planBibliographyCandidates, planCatalogQuery, projectCatalog, searchBibliography, selectCatalogIds, prepareCatalogSave, type BibliographyCandidatesInput, type BibliographySearchInput, type CatalogProjectionInput, type CatalogRequest, type CatalogSaveInput, type CatalogSelectionRows} from './catalog.mts';
+import {prepareDuplicateUndo, projectDuplicateCandidates, projectMergeOperations} from './duplicate-projections.mts';
+import type {DataRows} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/src/data.js';
 
 export interface CatalogDispatchRequest {readonly operation: string; readonly input: unknown}
 export interface CatalogDispatchResult {readonly operation: CatalogOperation; readonly input: unknown; readonly result: unknown}
@@ -48,6 +50,9 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
     case 'select': result = selectCatalogIds(request.input as CatalogSelectionRows); break;
     case 'project': result = projectCatalog(request.input as CatalogProjectionInput); break;
     case 'prepareSave': result = prepareCatalogSave(request.input as CatalogSaveInput); break;
+    case 'projectDuplicateCandidates': result = projectDuplicateCandidates(request.input as DataRows); break;
+    case 'projectMergeOperations': result = projectMergeOperations(request.input as DataRows); break;
+    case 'prepareDuplicateUndo': result = prepareDuplicateUndo((request.input as {readonly snapshotJson: string}).snapshotJson); break;
     case 'prepareBrowserCapture': result = prepareBrowserCapture(request.input as BrowserCaptureInput); break;
     case 'prepareLiteratureLifecycle': result = prepareLifecycle(request.input as LifecycleRequest); break;
     case 'prepareTrashCleanup': result = prepareTrashCleanup(); break;
