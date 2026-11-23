@@ -13,6 +13,7 @@ import {evaluate as evaluatePaperContextPreview, type PaperContextPreviewInput} 
 import {prepareReferenceRecord, type ReferenceRecordDraft} from './reference-records.mts';
 import {prepareTrashCleanup} from './trash-cleanup.mts';
 import {prepareConceptRetrieval, type ConceptRetrievalInput} from './concept-retrieval-prepare.mts';
+import {confirmMetadataFields, metadataDerivationPolicy, metadataFieldName, metadataUpdateSources, prepareMetadataPatch, type MetadataPatch} from './metadata.mts';
 
 export interface CatalogDispatchRequest {readonly operation: string; readonly input: unknown}
 export interface CatalogDispatchResult {readonly operation: CatalogOperation; readonly input: unknown; readonly result: unknown}
@@ -38,10 +39,26 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
     case 'validateNalAnnotation': result = {kind: (validateNalAnnotationRequest(request.input as NalAnnotationRequest) === null ? 'valid' : 'invalidRequest')}; break;
     case 'prepareNalAnnotation': {const input = request.input as {request: NalAnnotationRequest; snapshot: NalAnnotationSnapshot}; result = planNalAnnotation(input.request, input.snapshot); break;}
     case 'prepareConceptRetrieval': result = prepareConceptRetrieval(request.input as ConceptRetrievalInput); break;
+    case 'prepareMetadata': result = dispatchMetadata(request.input); break;
     case 'preparePaperContext': result = dispatchPaperContext(request.input as PaperContextDispatchInput); break;
     default: throw new Error(`literature_catalog_operation_unimplemented:${operation}`);
   }
   return {operation, input: structuredClone(request.input), result};
+}
+
+function dispatchMetadata(value: unknown): unknown {
+  const input = value as {readonly kind: 'update' | 'confirm' | 'reject'; readonly input: any};
+  if (input.kind === 'update') {
+    const patch = input.input.patch as MetadataPatch;
+    return {kind: 'update', plan: {input: input.input, fieldName: metadataFieldName(patch), patch: prepareMetadataPatch(patch, input.input.doi ?? null), sources: metadataUpdateSources(), derivation: metadataDerivationPolicy()}};
+  }
+  if (input.kind === 'confirm') {
+    const fields = confirmMetadataFields(input.input.fieldNames);
+    return {kind: 'confirm', outcome: Array.isArray(fields)
+      ? {status: 'ready', input: input.input, fields: fields.map(fieldName => ({fieldName, missingProvenance: {kind: 'invalidFields', reason: `字段 ${fieldName} 没有可确认的来源`}}))}
+      : {status: 'rejected', input: input.input, error: fields}};
+  }
+  return {kind: 'reject', plan: {input: input.input, zeroAffected: {kind: 'notFound'}}};
 }
 
 type PaperContextDispatchInput = PaperPreparationInput | PaperContextPreviewInput;
