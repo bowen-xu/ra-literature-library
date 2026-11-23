@@ -33,7 +33,7 @@ test("analysis history retains the four original SQL byte resources", async () =
   assert.ok(Object.isFrozen(literatureAnalysisHistoryResources));
   assert.deepEqual(literatureAnalysisHistoryResources, expected.map(([file]) => file));
   for (const [file, size, sha256] of expected) {
-    const bytes = await fs.readFile(new URL("../native/data/" + file, import.meta.url));
+    const bytes = await fs.readFile(new URL("../backend/data/" + file, import.meta.url));
     assert.equal(bytes.length, size);
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"), sha256);
   }
@@ -48,7 +48,7 @@ test("AI reference acceptance packages only its finite original transaction reso
   assert.deepEqual(literatureReferenceAcceptanceResources, expected.map(([name]) => name));
   assert.ok(Object.isFrozen(literatureReferenceAcceptanceResources));
   for (const [name, hash] of expected) {
-    const bytes = await fs.readFile(new URL(`../native/data/${name}`, import.meta.url));
+    const bytes = await fs.readFile(new URL(`../backend/data/${name}`, import.meta.url));
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"), hash);
   }
 });
@@ -115,7 +115,7 @@ test("matrix resources retain the original fourteen statement bytes", async () =
   assert.deepEqual(literatureMatrixResources, expected.map(([name]) => name));
   assert.ok(Object.isFrozen(literatureMatrixResources));
   for (const [name, digest] of expected) {
-    const bytes = await fs.readFile(new URL(`../native/data/${name}`, import.meta.url));
+    const bytes = await fs.readFile(new URL(`../backend/data/${name}`, import.meta.url));
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"), digest);
   }
 });
@@ -140,7 +140,7 @@ test("retained matrix dependencies retain four original evidence read statements
   ]
 ];
  assert.deepEqual(literatureEvidenceResources, expected.map(([name])=>name));
- for (const [name,digest] of expected) assert.equal(crypto.createHash("sha256").update(await fs.readFile(new URL(`../native/data/${name}`,import.meta.url))).digest("hex"),digest);
+ for (const [name,digest] of expected) assert.equal(crypto.createHash("sha256").update(await fs.readFile(new URL(`../backend/data/${name}`,import.meta.url))).digest("hex"),digest);
 });
 
 test("matrix synthesis packages the original context and atomic acceptance statements", async () => {
@@ -156,7 +156,7 @@ test("matrix synthesis packages the original context and atomic acceptance state
   assert.ok(Object.isFrozen(literatureMatrixSynthesisResources));
   assert.ok(Object.isFrozen(literatureDerivedAcceptanceResources));
   for (const [name, hash] of expected) {
-    const bytes = await fs.readFile(new URL(`../native/data/${name}`, import.meta.url));
+    const bytes = await fs.readFile(new URL(`../backend/data/${name}`, import.meta.url));
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"), hash);
   }
 });
@@ -192,7 +192,7 @@ test("manual derived-view storage retains the six original statements", async ()
   assert.deepEqual(literatureDerivedViewResources, expected.map(([name]) => name));
   assert.ok(Object.isFrozen(literatureDerivedViewResources));
   for (const [name, hash] of expected) {
-    const bytes = await fs.readFile(new URL(`../native/data/${name}`, import.meta.url));
+    const bytes = await fs.readFile(new URL(`../backend/data/${name}`, import.meta.url));
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"), hash);
   }
 });
@@ -232,7 +232,7 @@ test("manual evidence writes retain the seven original statements", async () => 
   assert.deepEqual(literatureEvidenceWriteResources, expected.map(([name]) => name));
   assert.ok(Object.isFrozen(literatureEvidenceWriteResources));
   for (const [name, hash] of expected) {
-    const bytes = await fs.readFile(new URL(`../native/data/${name}`, import.meta.url));
+    const bytes = await fs.readFile(new URL(`../backend/data/${name}`, import.meta.url));
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"), hash);
   }
 });
@@ -358,7 +358,7 @@ test("accepted knowledge, paper roles and human capture package exact original s
   assert.ok(Object.isFrozen(literatureKnowledgePromotionResources));
   assert.deepEqual(literatureKnowledgePromotionResources, expected.map(([name]) => name));
   for (const [name, hash] of expected) {
-    const bytes = await fs.readFile(new URL(`../native/data/${name}`, import.meta.url));
+    const bytes = await fs.readFile(new URL(`../backend/data/${name}`, import.meta.url));
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"), hash);
   }
 });
@@ -437,7 +437,7 @@ test("complete research export retains all original dataset SQL and read order",
   assert.ok(Object.isFrozen(literatureResearchExportResources));
   assert.deepEqual(literatureResearchExportResources, expected.map(([name]) => name));
   for (const [name, hash] of expected) {
-    const bytes = await fs.readFile(new URL("../native/data/" + name, import.meta.url));
+    const bytes = await fs.readFile(new URL("../backend/data/" + name, import.meta.url));
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"), hash);
   }
 });
@@ -497,7 +497,7 @@ test("browser capture keeps its original twelve fixed SQL resources", async () =
   assert.ok(Object.isFrozen(literatureBrowserCaptureResources));
   assert.deepEqual(literatureBrowserCaptureResources, expected.map(([name]) => name));
   for (const [name, hash] of expected) {
-    const bytes = await fs.readFile(new URL("../native/data/" + name, import.meta.url));
+    const bytes = await fs.readFile(new URL("../backend/data/" + name, import.meta.url));
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"), hash);
   }
 });
