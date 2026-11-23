@@ -37,11 +37,11 @@ export function mockPaperTemplateGateway(storage: Storage, store: CandidateStore
     startPaperAnalysis: async draft => {
       const paper = await getLiteratureGateway().get(draft.paperId);
       const { definition, fieldIds, source, sources } = await mockPaperExtractionInput(draft, paper, store.list());
-      const context = draft.attachmentIds.map(id => {
+      const context = draft.attachmentIds.map((id: string) => {
         const attachment = paper.attachments.find(value => value.id === id);
         if (attachment === undefined) throw new Error("模拟附件不存在");
         return { id, sha256: attachment.contentSha256 };
-      }).sort((a, b) => a.id.localeCompare(b.id));
+      }).sort((a: {readonly id: string}, b: {readonly id: string}) => a.id.localeCompare(b.id));
       const contextSnapshotId = [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify(context))))]
         .map(value => value.toString(16).padStart(2, "0")).join("");
       const existing = workflows.find(value => value.paperId === draft.paperId && value.contextSnapshotId === contextSnapshotId);
@@ -77,7 +77,7 @@ export function mockPaperTemplateGateway(storage: Storage, store: CandidateStore
       if (payload?.kind !== "paper_overview_unit_v1") throw new Error("候选结构错误");
       const template = payload.paperTemplate; const paperId = candidate.evidenceBundle.items[0]?.paperId;
       if (paperId === undefined || draft.fieldKinds.length === 0 || new Set(draft.fieldKinds).size !== draft.fieldKinds.length) throw new Error("确认字段无效");
-      const fields = draft.fieldKinds.map(id => {
+      const fields = draft.fieldKinds.map((id: string) => {
         const field = payload.fields.find(value => value.field === id);
         if (field === undefined || field.statements.length === 0 || candidate.overviewFieldConfirmations.some(value => value.active && value.fieldKind === id)) throw new Error("字段无内容或已确认");
         return field;
@@ -96,12 +96,12 @@ export function mockPaperTemplateGateway(storage: Storage, store: CandidateStore
       const previousFor = (fieldId: string): StructuredReadingUnit | undefined => units.find(unit => unit.paperId === paperId
         && (template === undefined ? unit.templateField === undefined && unit.unitKind === fieldId
           : "portraitCandidateId" in template && unit.templateField?.portraitCandidateId === template.portraitCandidateId && unit.templateField.fieldId === fieldId));
-      priorUnits[batchId] = fields.flatMap(field => { const previous = previousFor(field.field); return previous === undefined ? [] : [previous]; });
-      const created: StructuredReadingUnit[] = fields.map(field => ({ id: previousFor(field.field)?.id ?? crypto.randomUUID(), paperId, unitKind: template === undefined ? STRUCTURED_READING_UNIT_KINDS.find(kind => kind === field.field) ?? "other" : "other",
+      priorUnits[batchId] = fields.flatMap((field: {readonly field: string}) => { const previous = previousFor(field.field); return previous === undefined ? [] : [previous]; });
+      const created: StructuredReadingUnit[] = fields.map((field: {readonly field: string; readonly statements: readonly {readonly text: string; readonly evidenceItemIds: readonly string[]}[]}) => ({ id: previousFor(field.field)?.id ?? crypto.randomUUID(), paperId, unitKind: template === undefined ? STRUCTURED_READING_UNIT_KINDS.find(kind => kind === field.field) ?? "other" : "other",
         title: `结构化阅读 · ${overviewFieldTitle(payload, field.field)}`,
-        body: field.statements.map(value => value.text).join("\n\n"), epistemicRole: "source_paraphrase" as const,
+        body: field.statements.map((value: {readonly text: string}) => value.text).join("\n\n"), epistemicRole: "source_paraphrase" as const,
         provenanceKind: decisionFor(field.field) === "human_edited" ? "ai_accepted_after_edit" as const : "ai_accepted_unchanged" as const,
-        revision: (previousFor(field.field)?.revision ?? 0) + 1, evidenceCount: new Set(field.statements.flatMap(value => value.evidenceItemIds)).size,
+        revision: (previousFor(field.field)?.revision ?? 0) + 1, evidenceCount: new Set(field.statements.flatMap((value: {readonly evidenceItemIds: readonly string[]}) => value.evidenceItemIds)).size,
         ...(template === undefined || !("portraitCandidateId" in template) ? {} : { templateField: { portraitCandidateId: template.portraitCandidateId, fieldId: field.field } }), createdAt: previousFor(field.field)?.createdAt ?? now, updatedAt: now }));
       const confirmations = created.map((unit, index) => ({ id: crypto.randomUUID(), batchId, candidateId: candidate.id, candidateRevision: draft.candidateRevision,
         fieldKind: fields[index]!.field, fieldPayloadHash: "e".repeat(64), decisionKind: decisionFor(fields[index]!.field), targetReadingUnitId: unit.id,

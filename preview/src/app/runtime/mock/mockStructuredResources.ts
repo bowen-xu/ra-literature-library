@@ -1,4 +1,4 @@
-import type { AiEvidenceItem } from "@research-assistant/core/ai";
+import type { AiCandidateRevision, AiEvidenceItem } from "@research-assistant/core/ai";
 import { DEFAULT_PORTRAIT_CATALOG, decodePortraitCatalog } from "@research-assistant/core/ai";
 import {
   structuredResourceFields,
@@ -238,8 +238,8 @@ export function createMockStructuredResources(storage: Storage, options: {
       const candidates = await getAiAssistanceGateway().listCandidates();
       const content = JSON.stringify(resource.content);
       const candidate = candidates.find(value =>
-        value.evidenceBundle.items.every(source => source.paperId === resource.paperId) &&
-        value.revisions.some(revision => JSON.stringify(revision.payload) === content));
+        value.evidenceBundle.items.every((source: AiEvidenceItem) => source.paperId === resource.paperId) &&
+        value.revisions.some((revision: AiCandidateRevision) => JSON.stringify(revision.payload) === content));
       const sources = candidate?.evidenceBundle.items ?? [];
       if (sources.length) {
         state.sources ??= {};
@@ -348,14 +348,14 @@ export function createMockStructuredResources(storage: Storage, options: {
       ]);
       const paperIds = [...new Set([
         ...candidates.filter(candidate => ["paper_portrait_v1", "paper_overview_unit_v1"].includes(candidate.candidateKind))
-          .flatMap(candidate => candidate.evidenceBundle.items.map(source => source.paperId)),
+          .flatMap(candidate => candidate.evidenceBundle.items.map((source: AiEvidenceItem) => source.paperId)),
         ...units.map(unit => unit.paperId).filter((id): id is string => !!id),
-        ...draft.presentations.map(value => value.paperId),
+        ...draft.presentations.map((value: {readonly paperId: string}) => value.paperId),
         ...readMockProfileSelections(storage).filter(value => value.profiles.length > 0).map(value => value.paperId),
       ])];
       let importedPaperCount = 0;
       for (const paperId of paperIds) {
-        const presentation = draft.presentations.find(value => value.paperId === paperId)?.presentation;
+        const presentation = draft.presentations.find((value: {readonly paperId: string; readonly presentation?: unknown}) => value.paperId === paperId)?.presentation;
         if (!state.imported.includes(paperId)) importedPaperCount++;
         await gateway.importLegacy({paperId, requestId: `startup:${paperId}`,
           ...(presentation ? {presentation} : {})});

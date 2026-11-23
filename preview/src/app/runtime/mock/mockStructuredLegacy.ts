@@ -1,4 +1,4 @@
-import { selectPaperPortraitTemplate } from "@research-assistant/core/ai";
+import { selectPaperPortraitTemplate, type AiAtomicStatementV1, type AiCandidateRevision, type AiEvidenceItem, type PaperOverviewFieldV1 } from "@research-assistant/core/ai";
 import type { ReadingProfileRef } from "@research-assistant/core/knowledge";
 import type { StructuredLegacyImport, StructuredResource, StructuredResourceWrite } from "@research-assistant/core/structured-resources";
 import { getAiAssistanceGateway } from "@research-assistant/workbench-preview/ai-assistance-gateway";
@@ -24,10 +24,10 @@ export async function importMockStructuredPaper(
     .find(value => value.revision === portraitSelection.revision)?.payload;
   const owned = candidates.filter(candidate =>
     candidate.candidateKind === "paper_overview_unit_v1" && candidate.reviewState !== "rejected" &&
-    candidate.evidenceBundle.items.every(source => source.paperId === request.paperId),
+    candidate.evidenceBundle.items.every((source: AiEvidenceItem) => source.paperId === request.paperId),
   ).sort((left, right) => right.createdAt.localeCompare(left.createdAt));
   const latest = owned[0];
-  const readingPayload = latest?.revisions.find(value => value.revision === latest.currentRevision)?.payload;
+  const readingPayload = latest?.revisions.find((value: AiCandidateRevision) => value.revision === latest.currentRevision)?.payload;
   const units = await getResearchKnowledgeGateway().listReadingUnits(undefined, request.paperId);
   const paperResources = resources.filter(value => value.paperId === request.paperId);
   const template = paperResources.find(value => value.kind === "readingTemplate")!;
@@ -35,14 +35,14 @@ export async function importMockStructuredPaper(
     request, owned, profiles.selection, units.length > 0, template, profiles.resolveProfile, put,
   );
   const projection = request.presentation?.fields ?? (readingPayload?.kind === "paper_overview_unit_v1"
-    ? readingPayload.fields.map(field => ({candidateId: latest!.id, fieldId: field.field})) : []);
-  const fields: unknown[] = projection.flatMap(pointer => {
+    ? readingPayload.fields.map((field: PaperOverviewFieldV1) => ({candidateId: latest!.id, fieldId: field.field})) : []);
+  const fields: unknown[] = projection.flatMap((pointer: {readonly candidateId: string; readonly fieldId: string}) => {
     const candidate = owned.find(value => value.id === pointer.candidateId);
-    const payload = candidate?.revisions.find(value => value.revision === candidate.currentRevision)?.payload;
+    const payload = candidate?.revisions.find((value: AiCandidateRevision) => value.revision === candidate.currentRevision)?.payload;
     const field = payload?.kind === "paper_overview_unit_v1"
-      ? payload.fields.find(value => value.field === pointer.fieldId) : undefined;
+      ? payload.fields.find((value: PaperOverviewFieldV1) => value.field === pointer.fieldId) : undefined;
     if (!field) return [];
-    const confirmation = candidate?.overviewFieldConfirmations.find(value =>
+    const confirmation = candidate?.overviewFieldConfirmations.find((value: {readonly fieldKind: string; readonly active: boolean; readonly reviewResetAt?: string}) =>
       value.fieldKind === field.field && (value.active || value.reviewResetAt));
     const unit = units.find(value => value.id === confirmation?.targetReadingUnitId &&
       !request.presentation?.hiddenUnitIds.includes(value.id));
@@ -52,7 +52,7 @@ export async function importMockStructuredPaper(
       id: field.statements[0]?.id ?? `${field.field}_manual`,
       text: unit.body,
       epistemicRole: field.statements[0]?.epistemicRole ?? "uncertain",
-      evidenceItemIds: field.statements.flatMap(statement => statement.evidenceItemIds),
+      evidenceItemIds: field.statements.flatMap((statement: AiAtomicStatementV1) => statement.evidenceItemIds),
     }]}];
   });
   for (const unit of [...units].sort((left, right) => left.updatedAt.localeCompare(right.updatedAt))) {
