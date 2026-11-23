@@ -23,6 +23,7 @@ import {decodePdfImportCandidate, preparePdfImportHeader, type PdfImportCandidat
 import {preparePaperConfirmation, type PaperConfirmationInput} from './paper-confirmation.mts';
 import {prepareAttachment, type AttachmentInput} from './attachments.mts';
 import {projectReadingHistory, type ReadingHistoryInput} from './reading-history.mts';
+import {prepareConcept, type ConceptRequest} from './concepts.mts';
 
 export interface CatalogDispatchRequest {readonly operation: string; readonly input: unknown}
 export interface CatalogDispatchResult {readonly operation: CatalogOperation; readonly input: unknown; readonly result: unknown}
@@ -61,6 +62,7 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
     case 'preparePaperConfirmation': result = preparePaperConfirmation(request.input as PaperConfirmationInput); break;
     case 'prepareLiteratureAttachment': result = prepareAttachment(request.input as AttachmentInput); break;
     case 'projectReadingHistory': result = projectReadingHistory(request.input as ReadingHistoryInput); break;
+    case 'prepareResearchConcept': result = prepareConcept(request.input as ConceptRequest); break;
     case 'preparePaperContext': result = dispatchPaperContext(request.input as PaperContextDispatchInput); break;
     default: throw new Error(`literature_catalog_operation_unimplemented:${operation}`);
   }

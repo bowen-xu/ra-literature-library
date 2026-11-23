@@ -33,3 +33,4 @@ export * from './pdf-import.mts';
 export * from './paper-confirmation.mts';
 export * from './attachments.mts';
 export * from './reading-history.mts';
+export * from './concepts.mts';
