@@ -1,0 +1,650 @@
+[
+  {
+    "name": "research-knowledge-panel",
+    "source": "src/features/knowledge/ResearchKnowledgePanel.tsx"
+  },
+  {
+    "name": "research-object-history",
+    "source": "src/features/knowledge/ResearchObjectHistory.tsx"
+  },
+  {
+    "name": "research-export-actions",
+    "source": "src/features/knowledge/researchExportActions.ts"
+  },
+  {
+    "name": "evidence-matrix-panel",
+    "source": "src/features/synthesis/EvidenceMatrixPanel.tsx"
+  },
+  {
+    "name": "derived-research-view-panel",
+    "source": "src/features/synthesis/DerivedResearchViewPanel.tsx"
+  },
+  {
+    "name": "knowledge-labels",
+    "source": "src/features/knowledge/knowledgeLabels.ts"
+  },
+  {
+    "name": "evidence-gateway",
+    "source": "src/services/evidenceGateway.ts"
+  },
+  {
+    "name": "knowledge-gateway",
+    "source": "src/services/knowledgeGateway.ts"
+  },
+  {
+    "name": "literature-gateway",
+    "source": "src/services/literatureGateway.ts"
+  },
+  {
+    "name": "research-export-gateway",
+    "source": "src/services/researchExportGateway.ts"
+  },
+  {
+    "name": "evidence-workspace.css",
+    "source": "src/components/EvidenceWorkspace.css"
+  },
+  {
+    "name": "pdf-reader",
+    "source": "src/components/PdfReader.tsx"
+  },
+  {
+    "name": "literature-metadata-dialog",
+    "source": "src/components/LiteratureMetadataDialog.tsx"
+  },
+  {
+    "name": "nal-gateway",
+    "source": "src/services/nalGateway.ts"
+  },
+  {
+    "name": "nal-query-gateway",
+    "source": "src/services/nalQueryGateway.ts"
+  },
+  {
+    "name": "reference-record-gateway",
+    "source": "src/services/referenceRecordGateway.ts"
+  },
+  {
+    "name": "configure-literature-services",
+    "source": "src/services/configureLiteratureServices.ts"
+  },
+  {
+    "name": "library-session-storage",
+    "source": "src/features/reader/session/librarySessionStorage.ts"
+  },
+  {
+    "name": "reader-session-registry",
+    "source": "src/features/reader/session/ReaderSessionRegistry.ts"
+  },
+  {
+    "name": "navigation",
+    "source": "src/public/navigation.ts"
+  },
+  {
+    "name": "literature-workspace",
+    "source": "src/components/LiteratureWorkspace.tsx"
+  },
+  {
+    "name": "paper-reading-reader",
+    "source": "src/features/reader/PaperReadingReader.tsx"
+  },
+  {
+    "name": "paper-overview-panel",
+    "source": "src/features/ai/PaperOverviewPanel.tsx"
+  },
+  {
+    "name": "manifest",
+    "source": "src/public/manifest.ts"
+  },
+  {
+    "name": "literature-import-notifications",
+    "source": "src/components/literatureImportNotifications.ts"
+  },
+  {
+    "name": "use-browser-capture-refresh",
+    "source": "src/components/useBrowserCaptureRefresh.ts"
+  },
+  {
+    "name": "literature-gateway-530536",
+    "source": "src/public/literatureGateway.ts"
+  },
+  {
+    "name": "use-literature-file-drop",
+    "source": "src/components/useLiteratureFileDrop.ts"
+  },
+  {
+    "name": "literature-file-drop",
+    "source": "src/components/literatureFileDrop.ts"
+  },
+  {
+    "name": "ai-candidate-review.css",
+    "source": "src/features/ai/AiCandidateReview.css"
+  },
+  {
+    "name": "use-evidence-inspection-state",
+    "source": "src/features/ai/useEvidenceInspectionState.ts"
+  },
+  {
+    "name": "concept-target-picker",
+    "source": "src/features/ai/ConceptTargetPicker.tsx"
+  },
+  {
+    "name": "ai-overview-retry-panel",
+    "source": "src/features/ai/AiOverviewRetryPanel.tsx"
+  },
+  {
+    "name": "concept-capture-panel",
+    "source": "src/features/knowledge/ConceptCapturePanel.tsx"
+  },
+  {
+    "name": "overview-field-sources",
+    "source": "src/features/ai/OverviewFieldSources.tsx"
+  },
+  {
+    "name": "paper-overview-panel.css",
+    "source": "src/features/ai/PaperOverviewPanel.css"
+  },
+  {
+    "name": "ai-task-launch-preview",
+    "source": "src/features/ai/AiTaskLaunchPreview.tsx"
+  },
+  {
+    "name": "docling-developer-actions",
+    "source": "src/features/ai/DoclingDeveloperActions.tsx"
+  },
+  {
+    "name": "paper-overview-test-fixtures",
+    "source": "src/features/ai/paperOverviewTestFixtures.ts"
+  },
+  {
+    "name": "review-confirmation-dialog",
+    "source": "src/features/ai/ReviewConfirmationDialog.tsx"
+  },
+  {
+    "name": "prepare-initial-reading-template",
+    "source": "src/features/ai/resources/prepareInitialReadingTemplate.ts"
+  },
+  {
+    "name": "use-paper-structured-resources",
+    "source": "src/features/ai/resources/usePaperStructuredResources.ts"
+  },
+  {
+    "name": "paper-portrait-panel",
+    "source": "src/features/ai/PaperPortraitPanel.tsx"
+  },
+  {
+    "name": "reading-profile-selector",
+    "source": "src/features/ai/ReadingProfileSelector.tsx"
+  },
+  {
+    "name": "reading-template-dialog",
+    "source": "src/features/ai/resources/ReadingTemplateDialog.tsx"
+  },
+  {
+    "name": "portrait-detail-navigation",
+    "source": "src/features/ai/portraitDetailNavigation.ts"
+  },
+  {
+    "name": "portrait-catalog-preferences",
+    "source": "src/features/ai/portraitCatalogPreferences.ts"
+  },
+  {
+    "name": "paper-suggestion-panel",
+    "source": "src/features/ai/PaperSuggestionPanel.tsx"
+  },
+  {
+    "name": "mock-structured-resources",
+    "source": "preview/src/app/runtime/mock/mockStructuredResources.ts"
+  },
+  {
+    "name": "portrait-edit-history",
+    "source": "src/features/ai/PortraitEditHistory.tsx"
+  },
+  {
+    "name": "structured-portrait-editor",
+    "source": "src/features/ai/resources/StructuredPortraitEditor.tsx"
+  },
+  {
+    "name": "managed-reading-template",
+    "source": "src/features/ai/resources/ManagedReadingTemplate.tsx"
+  },
+  {
+    "name": "structured-resource-review",
+    "source": "src/features/ai/resources/StructuredResourceReview.tsx"
+  },
+  {
+    "name": "structured-reading-candidate-panel",
+    "source": "src/features/ai/StructuredReadingCandidatePanel.tsx"
+  },
+  {
+    "name": "reading-field-sources",
+    "source": "src/features/ai/readingFieldSources.ts"
+  },
+  {
+    "name": "ai-evidence-navigation",
+    "source": "src/features/ai/aiEvidenceNavigation.ts"
+  },
+  {
+    "name": "paper-analysis-activity",
+    "source": "src/features/ai/paperAnalysisActivity.ts"
+  },
+  {
+    "name": "reading-presentation",
+    "source": "src/features/ai/readingPresentation.ts"
+  },
+  {
+    "name": "structured-field-source-links",
+    "source": "src/features/ai/resources/StructuredFieldSourceLinks.tsx"
+  },
+  {
+    "name": "use-structured-hbs-session",
+    "source": "src/features/ai/resources/useStructuredHbsSession.ts"
+  },
+  {
+    "name": "reading-panel-events",
+    "source": "src/features/ai/readingPanelEvents.ts"
+  },
+  {
+    "name": "use-paper-portrait-run",
+    "source": "src/features/ai/usePaperPortraitRun.ts"
+  },
+  {
+    "name": "concept-workspace",
+    "source": "src/features/knowledge/ConceptWorkspace.tsx"
+  },
+  {
+    "name": "concept-identity-workspace",
+    "source": "src/features/knowledge/ConceptIdentityWorkspace.tsx"
+  },
+  {
+    "name": "reading-note-research-actions",
+    "source": "src/features/knowledge/ReadingNoteResearchActions.tsx"
+  },
+  {
+    "name": "relation-workspace",
+    "source": "src/features/knowledge/RelationWorkspace.tsx"
+  },
+  {
+    "name": "nal-sidebar",
+    "source": "src/features/nal/NalSidebar.tsx"
+  },
+  {
+    "name": "nal-concept-editor",
+    "source": "src/features/nal/NalConceptEditor.tsx"
+  },
+  {
+    "name": "use-nal",
+    "source": "src/features/nal/useNal.ts"
+  },
+  {
+    "name": "nal-management-panel",
+    "source": "src/features/nal/NalManagementPanel.tsx"
+  },
+  {
+    "name": "nal-statements",
+    "source": "src/features/nal/NalStatements.tsx"
+  },
+  {
+    "name": "nal-query-directory",
+    "source": "src/features/nal/NalQueryDirectory.tsx"
+  },
+  {
+    "name": "nal-existing-concept-editor",
+    "source": "src/features/nal/NalExistingConceptEditor.tsx"
+  },
+  {
+    "name": "use-nal-annotation",
+    "source": "src/features/nal/useNalAnnotation.ts"
+  },
+  {
+    "name": "literature-notes",
+    "source": "src/features/reader/LiteratureNotes.tsx"
+  },
+  {
+    "name": "reader-command-dispatcher",
+    "source": "src/features/reader/commands/ReaderCommandDispatcher.ts"
+  },
+  {
+    "name": "paper-agent-projection",
+    "source": "src/features/reader/paperAgentProjection.ts"
+  },
+  {
+    "name": "paper-agent-composer",
+    "source": "src/features/reader/paperAgentComposer.ts"
+  },
+  {
+    "name": "paper-ai-reading-panel.css",
+    "source": "src/features/reader/PaperAiReadingPanel.css"
+  },
+  {
+    "name": "paper-ai-reading-markdown",
+    "source": "src/features/reader/PaperAiReadingMarkdown.tsx"
+  },
+  {
+    "name": "pdf-region-screenshot",
+    "source": "src/features/reader/pdf/pdfRegionScreenshot.ts"
+  },
+  {
+    "name": "paper-reading-bootstrap-control",
+    "source": "src/features/reader/PaperReadingBootstrapControl.tsx"
+  },
+  {
+    "name": "position-note-marker",
+    "source": "src/features/reader/PositionNoteMarker.tsx"
+  },
+  {
+    "name": "reader-session-controller",
+    "source": "src/features/reader/session/ReaderSessionController.ts"
+  },
+  {
+    "name": "reading-source-highlights",
+    "source": "src/features/reader/ReadingSourceHighlights.tsx"
+  },
+  {
+    "name": "annotation-controller",
+    "source": "src/features/reader/annotations/AnnotationController.ts"
+  },
+  {
+    "name": "use-annotation-refresh-version",
+    "source": "src/features/reader/annotations/useAnnotationRefreshVersion.ts"
+  },
+  {
+    "name": "literature-note-order",
+    "source": "src/features/reader/literatureNoteOrder.ts"
+  },
+  {
+    "name": "docling-overlay-model",
+    "source": "src/features/reader/pdf/doclingOverlayModel.ts"
+  },
+  {
+    "name": "structured-blocks-toggle",
+    "source": "src/features/reader/pdf/StructuredBlocksToggle.tsx"
+  },
+  {
+    "name": "use-structured-blocks",
+    "source": "src/features/reader/pdf/useStructuredBlocks.ts"
+  },
+  {
+    "name": "selection-annotation",
+    "source": "src/features/reader/selection/selectionAnnotation.ts"
+  },
+  {
+    "name": "pdf-selection-actions",
+    "source": "src/features/knowledge/PdfSelectionActions.tsx"
+  },
+  {
+    "name": "use-reader-selection-sessions",
+    "source": "src/features/reader/selection/useReaderSelectionSessions.ts"
+  },
+  {
+    "name": "submit-selection-annotation",
+    "source": "src/features/reader/selection/submitSelectionAnnotation.ts"
+  },
+  {
+    "name": "selection-docling-context",
+    "source": "src/features/reader/selection/selectionDoclingContext.ts"
+  },
+  {
+    "name": "selection-explanation-message",
+    "source": "src/features/reader/selection/selectionExplanationMessage.ts"
+  },
+  {
+    "name": "position-notes",
+    "source": "src/features/reader/positionNotes.ts"
+  },
+  {
+    "name": "use-reader-source-selection",
+    "source": "src/features/reader/selection/useReaderSourceSelection.ts"
+  },
+  {
+    "name": "reader-source-navigation",
+    "source": "src/features/reader/ReaderSourceNavigation.ts"
+  },
+  {
+    "name": "reader-recovery-draft",
+    "source": "src/features/reader/session/readerRecoveryDraft.ts"
+  },
+  {
+    "name": "reference-verification-panel",
+    "source": "src/features/synthesis/ReferenceVerificationPanel.tsx"
+  },
+  {
+    "name": "collection-gateway",
+    "source": "src/services/collectionGateway.ts"
+  },
+  {
+    "name": "browser-nal-storage",
+    "source": "src/services/browserNalStorage.ts"
+  },
+  {
+    "name": "browser-knowledge-storage",
+    "source": "src/services/browserKnowledgeStorage.ts"
+  },
+  {
+    "name": "nal-legacy-cleanup",
+    "source": "src/services/nalLegacyCleanup.ts"
+  },
+  {
+    "name": "nal-query-collections",
+    "source": "src/services/nalQueryCollections.ts"
+  },
+  {
+    "name": "paper-generation-preparation",
+    "source": "src/services/paperGenerationPreparation.ts"
+  },
+  {
+    "name": "configuration",
+    "source": "src/public/configuration.ts"
+  },
+  {
+    "name": "preview-literature-fixtures",
+    "source": "preview/src/app/runtime/mock/previewLiteratureFixtures.ts"
+  },
+  {
+    "name": "collection-gateway-ce69e6",
+    "source": "src/public/collectionGateway.ts"
+  },
+  {
+    "name": "runtime-adapters",
+    "source": "src/public/runtimeAdapters.ts"
+  },
+  {
+    "name": "electron-collection-nal-gateways",
+    "source": "preview/src/app/runtime/literature/electronCollectionNalGateways.ts"
+  },
+  {
+    "name": "research-export-gateway-892e2f",
+    "source": "src/public/contracts/researchExportGateway.ts"
+  },
+  {
+    "name": "electron-research-export-gateway",
+    "source": "preview/src/app/runtime/literature/electronResearchExportGateway.ts"
+  },
+  {
+    "name": "electron-literature-gateway",
+    "source": "preview/src/app/runtime/literature/electronLiteratureGateway.ts"
+  },
+  {
+    "name": "electron-research-gateways",
+    "source": "preview/src/app/runtime/literature/electronResearchGateways.ts"
+  },
+  {
+    "name": "mock-literature-gateway",
+    "source": "preview/src/app/runtime/mock/mockLiteratureGateway.ts"
+  },
+  {
+    "name": "mock-paper-portrait-gateway",
+    "source": "preview/src/app/runtime/mock/mockPaperPortraitGateway.ts"
+  },
+  {
+    "name": "mock-docling-gateway",
+    "source": "preview/src/app/runtime/mock/mockDoclingGateway.ts"
+  },
+  {
+    "name": "mock-parsed-paper-sources",
+    "source": "preview/src/app/runtime/mock/mockParsedPaperSources.ts"
+  },
+  {
+    "name": "mock-paper-template-gateway",
+    "source": "preview/src/app/runtime/mock/mockPaperTemplateGateway.ts"
+  },
+  {
+    "name": "browser-knowledge-gateway",
+    "source": "src/services/browserKnowledgeGateway.ts"
+  },
+  {
+    "name": "browser-reading-profiles",
+    "source": "src/services/browserReadingProfiles.ts"
+  },
+  {
+    "name": "template-reading-records",
+    "source": "src/features/ai/TemplateReadingRecords.tsx"
+  },
+  {
+    "name": "mock-structured-state-codec",
+    "source": "preview/src/app/runtime/mock/mockStructuredStateCodec.ts"
+  },
+  {
+    "name": "mock-structured-review",
+    "source": "preview/src/app/runtime/mock/mockStructuredReview.ts"
+  },
+  {
+    "name": "knowledge-gateway-af2700",
+    "source": "src/public/knowledgeGateway.ts"
+  },
+  {
+    "name": "seed-nal-mock-data",
+    "source": "preview/src/app/runtime/mock/seedNalMockData.ts"
+  },
+  {
+    "name": "vision-by-logic-fixture",
+    "source": "preview/src/app/runtime/mock/visionByLogicFixture.ts"
+  },
+  {
+    "name": "vision-by-logic-fixture-data.json",
+    "source": "preview/src/app/runtime/mock/visionByLogicFixtureData.json"
+  },
+  {
+    "name": "paper-preparation",
+    "source": "src/public/paperPreparation.ts"
+  },
+  {
+    "name": "research",
+    "source": "src/public/research.ts"
+  },
+  {
+    "name": "reader-workspace-model",
+    "source": "src/features/reader/readerWorkspaceModel.ts"
+  },
+  {
+    "name": "nal-editor-preview",
+    "source": "preview/nal/NalEditorPreview.tsx"
+  },
+  {
+    "name": "nal-editor-scenarios",
+    "source": "preview/nal/nalEditorScenarios.ts"
+  },
+  {
+    "name": "public",
+    "source": "preview/public.ts"
+  },
+  {
+    "name": "reorder-example",
+    "source": "preview/src/app/previews/components/ReorderExample.tsx"
+  },
+  {
+    "name": "nal-editor",
+    "source": "preview/src/app/previews/components/nal-editor.tsx"
+  },
+  {
+    "name": "configure-literature-services-c7194f",
+    "source": "preview/src/app/runtime/literature/configureLiteratureServices.ts"
+  },
+  {
+    "name": "configure-literature-workbench",
+    "source": "preview/src/app/runtime/literature/configureLiteratureWorkbench.ts"
+  },
+  {
+    "name": "mock-paper-extraction-input",
+    "source": "preview/src/app/runtime/mock/mockPaperExtractionInput.ts"
+  },
+  {
+    "name": "mock-research-contexts",
+    "source": "preview/src/app/runtime/mock/mockResearchContexts.ts"
+  },
+  {
+    "name": "mock-structured-hbs",
+    "source": "preview/src/app/runtime/mock/mockStructuredHbs.ts"
+  },
+  {
+    "name": "mock-structured-legacy",
+    "source": "preview/src/app/runtime/mock/mockStructuredLegacy.ts"
+  },
+  {
+    "name": "mock-structured-legacy-template",
+    "source": "preview/src/app/runtime/mock/mockStructuredLegacyTemplate.ts"
+  },
+  {
+    "name": "mock-structured-profiles",
+    "source": "preview/src/app/runtime/mock/mockStructuredProfiles.ts"
+  },
+  {
+    "name": "seed-nal-query-examples",
+    "source": "preview/src/app/runtime/mock/seedNalQueryExamples.ts"
+  },
+  {
+    "name": "bibliography",
+    "source": "src/public/bibliography.ts"
+  },
+  {
+    "name": "derived-view-gateway",
+    "source": "src/public/contracts/derivedViewGateway.ts"
+  },
+  {
+    "name": "evidence-gateway-24aee3",
+    "source": "src/public/contracts/evidenceGateway.ts"
+  },
+  {
+    "name": "evidence-matrix-gateway",
+    "source": "src/public/contracts/evidenceMatrixGateway.ts"
+  },
+  {
+    "name": "knowledge-gateway-f58a75",
+    "source": "src/public/contracts/knowledgeGateway.ts"
+  },
+  {
+    "name": "literature-gateway-1fb76c",
+    "source": "src/public/contracts/literatureGateway.ts"
+  },
+  {
+    "name": "reference-record-gateway-0c21be",
+    "source": "src/public/contracts/referenceRecordGateway.ts"
+  },
+  {
+    "name": "derived-view-gateway-6d70c8",
+    "source": "src/public/derivedViewGateway.ts"
+  },
+  {
+    "name": "evidence-gateway-28f656",
+    "source": "src/public/evidenceGateway.ts"
+  },
+  {
+    "name": "evidence-matrix-gateway-93e2d2",
+    "source": "src/public/evidenceMatrixGateway.ts"
+  },
+  {
+    "name": "reference-record-gateway-718d80",
+    "source": "src/public/referenceRecordGateway.ts"
+  },
+  {
+    "name": "research-export",
+    "source": "src/public/researchExport.ts"
+  },
+  {
+    "name": "transport-decoders",
+    "source": "src/public/transportDecoders.ts"
+  },
+  {
+    "name": "workspace",
+    "source": "src/public/workspace.ts"
+  }
+]

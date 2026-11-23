@@ -1,5 +1,7 @@
 {
   "name": "@research-assistant/literature-preview",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {},
+  "devDependencies": {}
 }
