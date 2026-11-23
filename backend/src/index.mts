@@ -14,3 +14,4 @@ export * from './trash-cleanup.mts';
 export * from './evidence-write.mts';
 export * from './evidence-matrix.mts';
 export * from './reference-records.mts';
+export * from './catalog-save.mts';
