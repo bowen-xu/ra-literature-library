@@ -1,3 +1,8 @@
 packages:
   - 'preview'
 storeDir: .cache/pnpm-store
+overrides:
+  '@research-assistant/core': file:.dependencies/sdk/web/core
+  '@research-assistant/data': file:.dependencies/sdk/web/data
+  '@research-assistant/writing': file:.dependencies/sdk/web/writing
+  '@research-assistant/workbench-sdk': file:.dependencies/sdk/web/workbench-sdk

@@ -1,0 +1,23 @@
+// Original authorized-reading statements. Core accepts their exact fixed grants.
+export const literaturePaperContextResources = Object.freeze([
+  "paper-context-attachments-paper-exists.v1.sql",
+  "paper-context-attachments-all.v1.sql",
+  "paper-context-attachments-exact.v1.sql",
+  "paper-context-snapshot-load-header.v1.sql",
+  "paper-context-snapshot-load-attachments.v1.sql",
+  "paper-context-snapshot-load-items.v1.sql",
+  "paper-context-snapshot-persist-find-hash.v1.sql",
+  "paper-context-snapshot-membership.v1.sql",
+  "paper-context-snapshot-item-geometry.v1.sql",
+  "paper-context-snapshot-repair-delete-items.v1.sql",
+  "paper-context-snapshot-repair-delete-attachments.v1.sql",
+  "paper-context-snapshot-repair-delete-header.v1.sql",
+  "paper-context-snapshot-persist-insert-header.v1.sql",
+  "paper-context-snapshot-persist-insert-attachment.v1.sql",
+  "paper-context-snapshot-persist-insert-item.v1.sql",
+  "paper-context-preview-header.v1.sql",
+  "paper-context-preview-items-budget.v1.sql",
+  "paper-context-preview-attachments-budget.v1.sql",
+  "paper-context-session-latest.v1.sql",
+  "paper-context-session-summary.v1.sql",
+]);

@@ -1,0 +1,8 @@
+/* Outer showcase only. Production tab, queue and field controls own all UI styles. */
+.reorder-example { max-width: 920px; margin: 0 auto; padding: 36px 24px 80px; }
+.reorder-example > header { margin-bottom: 32px; }
+.reorder-example > section { margin-top: 32px; }
+.reorder-example > header > h1 { font-size: var(--ui-font-heading); }
+.reorder-example > section > h2 { font-size: var(--ui-font-body); }
+.reorder-example > header > p, .reorder-example > section > p { font-size: var(--ui-font-label); color: #6b746c; }
+.reorder-example-tab-frame { height: 36px; display: flex; }
