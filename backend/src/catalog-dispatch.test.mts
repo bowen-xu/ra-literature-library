@@ -19,4 +19,6 @@ test('catalog dispatcher rejects unknown and not-yet-migrated operations explici
   assert.equal(context.operation, 'projectContextMetadata'); assert.deepEqual(context.result, {status: 'projected', bodyJson: '{"creators":[],"identifiers":[]}'});
   const derived = dispatchCatalog({operation: 'decideDerivedView', input: {kind: 'provenance', current: 'ai_suggestion', review: 'accepted'}});
   assert.equal(derived.operation, 'decideDerivedView'); assert.deepEqual(derived.result, {kind: 'provenance', value: 'ai_accepted_after_edit'});
+  const semantic = dispatchCatalog({operation: 'prepareSemanticIndex', input: {stage: 'activate', status: 'building', pending: 0n}});
+  assert.equal(semantic.operation, 'prepareSemanticIndex'); assert.deepEqual(semantic.result, {kind: 'flag', value: true});
 });

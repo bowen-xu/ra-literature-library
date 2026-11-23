@@ -27,3 +27,4 @@ export * from './candidate-revision.mts';
 export * from './reading-units.mts';
 export * from './context-metadata.mts';
 export * from './derived-view.mts';
+export * from './semantic-index.mts';
