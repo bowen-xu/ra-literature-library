@@ -33,4 +33,6 @@ test('catalog dispatcher rejects unknown and not-yet-migrated operations explici
   assert.deepEqual(bibliography.result, {kind: 'needle', needle: '%doi%'});
   const duplicates = dispatchCatalog({operation: 'projectDuplicateCandidates', input: {rows: [[{kind: 'text', value: 'id'}, {kind: 'text', value: 'left'}, {kind: 'text', value: 'Left'}, {kind: 'text', value: 'right'}, {kind: 'text', value: 'Right'}, {kind: 'text', value: 'reason'}, {kind: 'text', value: '0000000000000000'}]]}});
   assert.equal((duplicates.result as any)[0].confidenceBits.asString(), '0000000000000000');
+  const trace = dispatchCatalog({operation: 'decidePaperRetrievalTrace', input: {paperId: 'paper', query: 'question', row: null}});
+  assert.deepEqual(trace.result, {input: {paperId: 'paper', query: 'question', row: null}, decision: {status: 'rejected', reason: 'not_found'}});
 });
