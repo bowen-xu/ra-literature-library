@@ -9,3 +9,4 @@ export * from './nal-query.mts';
 export * from './nal-mutation.mts';
 export * from './literature-lifecycle.mts';
 export * from './nal-annotation.mts';
+export * from './review-selection.mts';
