@@ -35,4 +35,6 @@ test('catalog dispatcher rejects unknown and not-yet-migrated operations explici
   assert.equal((duplicates.result as any)[0].confidenceBits.asString(), '0000000000000000');
   const trace = dispatchCatalog({operation: 'decidePaperRetrievalTrace', input: {paperId: 'paper', query: 'question', row: null}});
   assert.deepEqual(trace.result, {input: {paperId: 'paper', query: 'question', row: null}, decision: {status: 'rejected', reason: 'not_found'}});
+  const importJobs = dispatchCatalog({operation: 'projectImportJobs', input: {kind: 'cancel', affectedRows: 1n}});
+  assert.deepEqual(importJobs.result, {status: 'success', result: {kind: 'done'}});
 });
