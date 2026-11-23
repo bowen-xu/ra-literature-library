@@ -23,4 +23,6 @@ test('catalog dispatcher rejects unknown and not-yet-migrated operations explici
   assert.equal(semantic.operation, 'prepareSemanticIndex'); assert.deepEqual(semantic.result, {kind: 'flag', value: true});
   const duplicate = dispatchCatalog({operation: 'prepareDuplicateMerge', input: {candidateId: 'candidate', survivorItemId: 'left', leftItemId: 'left', rightItemId: 'right'}});
   assert.equal(duplicate.operation, 'prepareDuplicateMerge'); assert.equal((duplicate.result as any).mergedItemId, 'right');
+  const pdf = dispatchCatalog({operation: 'decodePdfImportCandidate', input: {rawInput: '/tmp/Paper.pdf'}});
+  assert.equal(pdf.operation, 'decodePdfImportCandidate'); assert.equal((pdf.result as any).candidate.draft.title, 'Paper');
 });

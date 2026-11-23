@@ -29,3 +29,4 @@ export * from './context-metadata.mts';
 export * from './derived-view.mts';
 export * from './semantic-index.mts';
 export * from './duplicate-decisions.mts';
+export * from './pdf-import.mts';
