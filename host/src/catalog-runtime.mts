@@ -16,12 +16,17 @@ export class FileBackedCatalogRuntime {
   private readonly root: string;
   constructor(root: string) {this.root = root;}
 
+  async readJson<T>(input: SnapshotRef): Promise<T> {
+    let bytes: Uint8Array;
+    try {bytes = await readFile(this.safePath(input.relativeHandle));}
+    catch (cause) {if (cause instanceof CatalogRuntimeError) throw cause; throw new CatalogRuntimeError('io', 'literature_catalog_input_unavailable');}
+    if (bytes.byteLength !== input.byteSize || digest(bytes) !== input.sha256) throw new CatalogRuntimeError('input_mismatch', 'literature_catalog_input_mismatch');
+    try {return JSON.parse(new TextDecoder().decode(bytes)) as T;}
+    catch {throw new CatalogRuntimeError('input_mismatch', 'literature_catalog_input_invalid_json');}
+  }
+
   async dispatch(operation: string, input: SnapshotRef, output: SnapshotRef): Promise<SnapshotRef> {
-    let inputBytes: Uint8Array;
-    try {inputBytes = await readFile(this.safePath(input.relativeHandle));} catch (cause) {if (cause instanceof CatalogRuntimeError) throw cause; throw new CatalogRuntimeError('io', 'literature_catalog_input_unavailable');}
-    if (inputBytes.byteLength !== input.byteSize || digest(inputBytes) !== input.sha256) throw new CatalogRuntimeError('input_mismatch', 'literature_catalog_input_mismatch');
-    let value: unknown;
-    try {value = JSON.parse(new TextDecoder().decode(inputBytes));} catch {throw new CatalogRuntimeError('input_mismatch', 'literature_catalog_input_invalid_json');}
+    const value = await this.readJson<unknown>(input);
     let result: unknown;
     try {result = dispatchCatalog({operation, input: value});} catch (cause) {throw new CatalogRuntimeError('dispatch', cause instanceof Error ? cause.message : String(cause));}
     const resultBytes = new TextEncoder().encode(JSON.stringify(result));
