@@ -25,4 +25,6 @@ test('catalog dispatcher rejects unknown and not-yet-migrated operations explici
   assert.equal(duplicate.operation, 'prepareDuplicateMerge'); assert.equal((duplicate.result as any).mergedItemId, 'right');
   const pdf = dispatchCatalog({operation: 'decodePdfImportCandidate', input: {rawInput: '/tmp/Paper.pdf'}});
   assert.equal(pdf.operation, 'decodePdfImportCandidate'); assert.equal((pdf.result as any).candidate.draft.title, 'Paper');
+  const selected = dispatchCatalog({operation: 'selectUnreviewedFields', input: {resourceId: 'r', resourceRevision: 1, pendingFieldIds: ['a', 'b', 'a'], protectedFieldIds: ['b'], reviewedFieldIds: []}});
+  assert.deepEqual((selected.result as any).selectedFieldIds, ['a', 'a']);
 });

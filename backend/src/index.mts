@@ -35,3 +35,5 @@ export * from './attachments.mts';
 export * from './reading-history.mts';
 export * from './concepts.mts';
 export * from './analysis-history.mts';
+export * from './structured-validation.mts';
+export * from './editable-template.mts';

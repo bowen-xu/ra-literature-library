@@ -25,6 +25,9 @@ import {prepareAttachment, type AttachmentInput} from './attachments.mts';
 import {projectReadingHistory, type ReadingHistoryInput} from './reading-history.mts';
 import {prepareConcept, type ConceptRequest} from './concepts.mts';
 import {projectAnalysisHistory, type AnalysisHistoryInput} from './analysis-history.mts';
+import {validateStructured, type StructuredValidationInput} from './structured-validation.mts';
+import {validateEditableTemplate, type EditableTemplateInput} from './editable-template.mts';
+import {selectUnreviewedFields} from './review-selection.mts';
 
 export interface CatalogDispatchRequest {readonly operation: string; readonly input: unknown}
 export interface CatalogDispatchResult {readonly operation: CatalogOperation; readonly input: unknown; readonly result: unknown}
@@ -65,6 +68,9 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
     case 'projectReadingHistory': result = projectReadingHistory(request.input as ReadingHistoryInput); break;
     case 'prepareResearchConcept': result = prepareConcept(request.input as ConceptRequest); break;
     case 'projectAnalysisHistory': result = projectAnalysisHistory(request.input as AnalysisHistoryInput); break;
+    case 'validateStructured': result = validateStructured(request.input as StructuredValidationInput); break;
+    case 'selectUnreviewedFields': {const input = request.input as {readonly resourceId: string; readonly resourceRevision: number; readonly pendingFieldIds: readonly string[]; readonly protectedFieldIds: readonly string[]; readonly reviewedFieldIds: readonly string[]}; result = {input, selectedFieldIds: selectUnreviewedFields(input.pendingFieldIds, input.protectedFieldIds, input.reviewedFieldIds)}; break;}
+    case 'validateEditableTemplate': result = {input: request.input, decision: validateEditableTemplate(request.input as EditableTemplateInput)}; break;
     case 'preparePaperContext': result = dispatchPaperContext(request.input as PaperContextDispatchInput); break;
     default: throw new Error(`literature_catalog_operation_unimplemented:${operation}`);
   }
