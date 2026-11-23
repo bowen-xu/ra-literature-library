@@ -15,6 +15,7 @@ import {prepareTrashCleanup} from './trash-cleanup.mts';
 import {prepareConceptRetrieval, type ConceptRetrievalInput} from './concept-retrieval-prepare.mts';
 import {prepareMetadata} from './metadata.mts';
 import {prepareReadingUnit, type ReadingUnitRequest} from './reading-units.mts';
+import {projectContextMetadata, type ContextMetadataInput} from './context-metadata.mts';
 
 export interface CatalogDispatchRequest {readonly operation: string; readonly input: unknown}
 export interface CatalogDispatchResult {readonly operation: CatalogOperation; readonly input: unknown; readonly result: unknown}
@@ -42,6 +43,7 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
     case 'prepareConceptRetrieval': result = prepareConceptRetrieval(request.input as ConceptRetrievalInput); break;
     case 'prepareMetadata': result = prepareMetadata(request.input); break;
     case 'prepareReadingUnit': result = prepareReadingUnit(request.input as ReadingUnitRequest); break;
+    case 'projectContextMetadata': result = projectContextMetadata(request.input as ContextMetadataInput); break;
     case 'preparePaperContext': result = dispatchPaperContext(request.input as PaperContextDispatchInput); break;
     default: throw new Error(`literature_catalog_operation_unimplemented:${operation}`);
   }
