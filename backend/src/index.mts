@@ -20,3 +20,4 @@ export * from './browser-capture.mts';
 export * from './paper-context-preview.mts';
 export * from './paper-context-snapshot.mts';
 export * from './paper-context-prepare.mts';
+export * from './docling-evidence.mts';
