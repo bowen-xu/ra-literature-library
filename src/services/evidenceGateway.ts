@@ -74,10 +74,10 @@ const browserEvidenceGateway: EvidenceGateway = {
   },
   async listSources() { return []; },
   async linkEvidence() {
-    throw new Error("原文证据关联只在 Tauri 桌面模式中可用");
+    throw new Error("原文证据关联只在桌面模式中可用");
   },
   async createClaimWithEvidence() {
-    throw new Error("观点与原文证据的原子保存只在 Tauri 桌面模式中可用");
+    throw new Error("观点与原文证据的原子保存只在桌面模式中可用");
   },
   async listClaimEvidence() { return []; },
 };

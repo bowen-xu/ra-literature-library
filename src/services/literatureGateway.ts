@@ -199,7 +199,7 @@ const browserGateway: LiteratureGateway = {
     return updated;
   },
   async importPdfs() {
-    throw new Error("PDF 文件导入只在 Tauri 桌面模式中可用");
+    throw new Error("PDF 文件导入只在桌面模式中可用");
   },
   async importBibtex(drafts) {
     const started = new Date().toISOString();
@@ -235,12 +235,12 @@ const browserGateway: LiteratureGateway = {
     };
   },
   async getImportJob() {
-    throw new Error("导入任务只在 Tauri 桌面模式中可用");
+    throw new Error("导入任务只在桌面模式中可用");
   },
   async listImportJobs() { return []; },
   async cancelImportJob() {},
   async attachPdf() {
-    throw new Error("PDF 附件只可在 Tauri 桌面模式中添加");
+    throw new Error("PDF 附件只可在桌面模式中添加");
   },
   async renameAttachment(itemId, attachmentId, displayName) {
     const name = displayName.trim();
@@ -260,18 +260,18 @@ const browserGateway: LiteratureGateway = {
     return {fileStatus: "retained", warning: null};
   },
   async previewDoi() {
-    throw new Error("DOI 元数据预览只在 Tauri 桌面模式中可用");
+    throw new Error("DOI 元数据预览只在桌面模式中可用");
   },
   async applyMetadataCandidate(_candidateId, draft) { return this.save(draft); },
   async applyMetadataCandidateFields() {
-    throw new Error("DOI 元数据审阅只在 Tauri 桌面模式中可用");
+    throw new Error("DOI 元数据审阅只在桌面模式中可用");
   },
   async rejectMetadataCandidate() {},
   async readAttachment() {
-    throw new Error("PDF 阅读只在 Tauri 桌面模式中可用");
+    throw new Error("PDF 阅读只在桌面模式中可用");
   },
   async revealAttachments() {
-    throw new Error("在文件管理器中显示附件只在 Tauri 桌面模式中可用");
+    throw new Error("在文件管理器中显示附件只在桌面模式中可用");
   },
   async saveReadingState(_itemId, attachmentId, viewState) {
     getAppStorage().setItem(BROWSER_READING_STATE_KEY, JSON.stringify({
@@ -285,7 +285,7 @@ const browserGateway: LiteratureGateway = {
   async listDuplicates() { return []; },
   async decideDuplicate() {},
   async mergeDuplicate() {
-    throw new Error("重复文献合并只在 Tauri 桌面模式中可用");
+    throw new Error("重复文献合并只在桌面模式中可用");
   },
   async listMergeOperations() { return []; },
   async undoMerge() {},

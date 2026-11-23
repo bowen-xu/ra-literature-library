@@ -107,7 +107,7 @@ export function createLiteratureImportActions(context: LiteratureImportContext) 
   async function choosePdfs(): Promise<void> {
     context.setError(undefined);
     if (!hasPlatformCapabilities()) {
-      context.setError("浏览器预览模式不能读取本机文件；请在 Tauri 桌面模式中导入 PDF。");
+      context.setError("浏览器预览模式不能读取本机文件；请在桌面模式中导入 PDF。");
       return;
     }
     const paths = await open({ multiple: true, filters: [{ name: "PDF", extensions: ["pdf"] }] });
@@ -140,7 +140,7 @@ export function createLiteratureImportActions(context: LiteratureImportContext) 
   async function attachPdf(): Promise<void> {
     if (context.selected === undefined) return;
     if (!hasPlatformCapabilities()) {
-      context.setError("请在 Tauri 桌面模式中为文献添加 PDF 附件。");
+      context.setError("请在桌面模式中为文献添加 PDF 附件。");
       return;
     }
     const path = await open({ multiple: false, filters: [{ name: "PDF", extensions: ["pdf"] }] });

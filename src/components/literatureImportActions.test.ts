@@ -12,13 +12,13 @@ import {getLiteratureGateway} from "../services/literatureGateway";
 
 async function unrelatedAttachment(): Promise<never> {throw new Error("Unexpected attachment operation in import fixture");}
 
-const tauriMocks = vi.hoisted(() => ({
-  isTauri: vi.fn(() => true),
+const desktopMocks = vi.hoisted(() => ({
+  hasPlatform: vi.fn(() => true),
   open: vi.fn(),
 }));
 
-vi.mock("@research-assistant/workbench-sdk/environment", () => ({ hasPlatformCapabilities: tauriMocks.isTauri }));
-vi.mock("@research-assistant/workbench-sdk/platform", () => ({ open: tauriMocks.open }));
+vi.mock("@research-assistant/workbench-sdk/environment", () => ({ hasPlatformCapabilities: desktopMocks.hasPlatform }));
+vi.mock("@research-assistant/workbench-sdk/platform", () => ({ open: desktopMocks.open }));
 
 const draft: LiteratureDraft = {
   itemType: "journalArticle",
@@ -304,8 +304,8 @@ describe("selection after batch import", () => {
 
 describe("PDF file selection feedback", () => {
   it.each([null, []])("silently ignores a cancelled or empty dialog result", async (result) => {
-    tauriMocks.isTauri.mockReturnValue(true);
-    tauriMocks.open.mockResolvedValueOnce(result);
+    desktopMocks.hasPlatform.mockReturnValue(true);
+    desktopMocks.open.mockResolvedValueOnce(result);
     const { actions, setError, setNotice, setPanel } = setup();
 
     await actions.choosePdfs();

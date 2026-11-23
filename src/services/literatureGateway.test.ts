@@ -73,7 +73,7 @@ describe("browser-only attachment actions", () => {
   });
   it("does not pretend that Finder reveal is available", async () => {
     await expect(getLiteratureGateway().revealAttachments(["attachment-1"]))
-      .rejects.toThrow("只在 Tauri 桌面模式中可用");
+      .rejects.toThrow("只在桌面模式中可用");
   });
 
   it("round-trips the complete ReaderViewStateV2 per attachment", async () => {

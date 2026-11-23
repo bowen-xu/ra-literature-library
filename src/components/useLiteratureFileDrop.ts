@@ -100,7 +100,7 @@ export function useLiteratureFileDrop(options: LiteratureFileDropOptions) {
     const dropTarget = resolve(event.target instanceof Element ? event.target : null);
     if (dropTarget) {
       current.current.onWarning(dropTarget.kind === "blocked" ? literatureFileDropLabel(dropTarget)
-        : "请在 Tauri 桌面模式中拖入 PDF 文件；浏览器无法读取本机文件路径。");
+        : "请在桌面模式中拖入 PDF 文件；浏览器无法读取本机文件路径。");
     }
   }
 
