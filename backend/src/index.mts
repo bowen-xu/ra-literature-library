@@ -18,3 +18,4 @@ export * from './catalog-save.mts';
 export * from './import-jobs.mts';
 export * from './browser-capture.mts';
 export * from './paper-context-preview.mts';
+export * from './paper-context-snapshot.mts';
