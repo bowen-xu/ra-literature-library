@@ -7,3 +7,4 @@ export * from './concept-retrieval.mts';
 export * from './concept-retrieval-prepare.mts';
 export * from './nal-query.mts';
 export * from './nal-mutation.mts';
+export * from './literature-lifecycle.mts';
