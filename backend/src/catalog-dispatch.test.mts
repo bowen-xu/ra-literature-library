@@ -27,4 +27,8 @@ test('catalog dispatcher rejects unknown and not-yet-migrated operations explici
   assert.equal(pdf.operation, 'decodePdfImportCandidate'); assert.equal((pdf.result as any).candidate.draft.title, 'Paper');
   const selected = dispatchCatalog({operation: 'selectUnreviewedFields', input: {resourceId: 'r', resourceRevision: 1, pendingFieldIds: ['a', 'b', 'a'], protectedFieldIds: ['b'], reviewedFieldIds: []}});
   assert.deepEqual((selected.result as any).selectedFieldIds, ['a', 'a']);
+  const planned = dispatchCatalog({operation: 'plan', input: {kind: 'list', query: '2026'}});
+  assert.deepEqual(planned.result, {kind: 'search', ftsQuery: '{title creators} : "2026"*', year: 2026});
+  const bibliography = dispatchCatalog({operation: 'bibliographySearch', input: {phase: 'prepare', query: ' DOI '}});
+  assert.deepEqual(bibliography.result, {kind: 'needle', needle: '%doi%'});
 });

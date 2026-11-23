@@ -28,6 +28,7 @@ import {projectAnalysisHistory, type AnalysisHistoryInput} from './analysis-hist
 import {validateStructured, type StructuredValidationInput} from './structured-validation.mts';
 import {validateEditableTemplate, type EditableTemplateInput} from './editable-template.mts';
 import {selectUnreviewedFields} from './review-selection.mts';
+import {planBibliographyCandidates, planCatalogQuery, projectCatalog, searchBibliography, selectCatalogIds, prepareCatalogSave, type BibliographyCandidatesInput, type BibliographySearchInput, type CatalogProjectionInput, type CatalogRequest, type CatalogSaveInput, type CatalogSelectionRows} from './catalog.mts';
 
 export interface CatalogDispatchRequest {readonly operation: string; readonly input: unknown}
 export interface CatalogDispatchResult {readonly operation: CatalogOperation; readonly input: unknown; readonly result: unknown}
@@ -41,6 +42,12 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
   const operation = requireCatalogOperation(request.operation);
   let result: unknown;
   switch (operation) {
+    case 'bibliographySearch': result = searchBibliography(request.input as BibliographySearchInput); break;
+    case 'planBibliographyCandidates': result = planBibliographyCandidates(request.input as BibliographyCandidatesInput); break;
+    case 'plan': result = planCatalogQuery(request.input as CatalogRequest); break;
+    case 'select': result = selectCatalogIds(request.input as CatalogSelectionRows); break;
+    case 'project': result = projectCatalog(request.input as CatalogProjectionInput); break;
+    case 'prepareSave': result = prepareCatalogSave(request.input as CatalogSaveInput); break;
     case 'prepareBrowserCapture': result = prepareBrowserCapture(request.input as BrowserCaptureInput); break;
     case 'prepareLiteratureLifecycle': result = prepareLifecycle(request.input as LifecycleRequest); break;
     case 'prepareTrashCleanup': result = prepareTrashCleanup(); break;
