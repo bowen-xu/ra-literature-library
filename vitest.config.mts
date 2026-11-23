@@ -10,6 +10,6 @@ if (existsSync(toolingPath)) {
   runtimeSdkTestPlugin = module.runtimeSdkTestPlugin;
 }
 export default defineConfig({plugins: runtimeSdkTestPlugin === undefined ? [] : [runtimeSdkTestPlugin(paths)], test: {
-  exclude: ["preview/**", "artifacts/**", ".cache/**", "**/node_modules/**", ".tmp/**", ".dependencies/**", "build/**"],
+  exclude: ["preview/**", "artifacts/**", ".cache/**", "**/node_modules/**", ".tmp/**", ".dependencies/**", "build/**", "backend/**", "host/**", "scripts/*.test.mjs"],
   execArgv: process.allowedNodeEnvironmentFlags.has("--no-experimental-webstorage") ? ["--no-experimental-webstorage"] : [],
 }});
