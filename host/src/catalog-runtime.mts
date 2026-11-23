@@ -4,7 +4,8 @@ import {createHash, randomUUID} from 'node:crypto';
 import {readFile, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {dispatchCatalog} from '../../backend/src/catalog-dispatch.mts';
-import type {SnapshotRef} from '../../backend/src/literature-trace-protocol.mts';
+import {catalogResultHandle, type SnapshotRef} from '../../backend/src/literature-trace-protocol.mts';
+import type {LiteratureTraceHostHandlers} from './literature-trace-host.mts';
 
 export class CatalogRuntimeError extends Error {
   readonly code: 'invalid_handle' | 'input_mismatch' | 'io' | 'dispatch';
@@ -38,3 +39,10 @@ export class FileBackedCatalogRuntime {
 
 function digest(bytes: Uint8Array): string {return createHash('sha256').update(bytes).digest('hex');}
 export function newCatalogRequestIdentity(): {readonly instanceId: string; readonly requestId: string} {return {instanceId: randomUUID(), requestId: randomUUID()};}
+
+export function createFileBackedCatalogHandler(runtime: FileBackedCatalogRuntime): LiteratureTraceHostHandlers['catalog'] {
+  return (operation, input) => runtime.dispatch(operation, input, {
+    relativeHandle: catalogResultHandle(input.requestId), byteSize: 1, sha256: '0'.repeat(64),
+    packageKey: input.packageKey, instanceId: input.instanceId, requestId: input.requestId,
+  });
+}
