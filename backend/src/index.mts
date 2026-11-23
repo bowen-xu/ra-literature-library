@@ -16,3 +16,4 @@ export * from './evidence-matrix.mts';
 export * from './reference-records.mts';
 export * from './catalog-save.mts';
 export * from './import-jobs.mts';
+export * from './browser-capture.mts';
