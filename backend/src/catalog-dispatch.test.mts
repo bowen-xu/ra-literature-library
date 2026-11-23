@@ -37,4 +37,6 @@ test('catalog dispatcher rejects unknown and not-yet-migrated operations explici
   assert.deepEqual(trace.result, {input: {paperId: 'paper', query: 'question', row: null}, decision: {status: 'rejected', reason: 'not_found'}});
   const importJobs = dispatchCatalog({operation: 'projectImportJobs', input: {kind: 'cancel', affectedRows: 1n}});
   assert.deepEqual(importJobs.result, {status: 'success', result: {kind: 'done'}});
+  const probes = dispatchCatalog({operation: 'prepareNalBootstrapProbes', input: {legacyImported: {state: 'available', value: false}, collections: {state: 'available', value: []}, relationTypes: {state: 'skipped'}, relatedFieldUsed: {state: 'skipped'}, relations: {state: 'skipped'}, memberships: {state: 'skipped'}, assignments: {state: 'skipped'}, repairVersion: {state: 'available', value: 1n}, repairRecords: {state: 'skipped'}, configuredEmbedding: {state: 'skipped'}}});
+  assert.deepEqual((probes.result as any).concepts, []);
 });
