@@ -13,4 +13,6 @@ test('catalog dispatcher rejects unknown and not-yet-migrated operations explici
   assert.throws(() => dispatchCatalog({operation: 'unknown', input: {}}), /literature_catalog_operation_invalid/);
   const prepared = dispatchCatalog({operation: 'prepareMetadata', input: {kind: 'confirm', input: {itemId: 'paper', fieldNames: ['title']}}});
   assert.equal(prepared.operation, 'prepareMetadata'); assert.equal((prepared.result as any).kind, 'confirm');
+  const reading = dispatchCatalog({operation: 'prepareReadingUnit', input: {kind: 'list', projectId: null, paperId: 'paper'}});
+  assert.equal(reading.operation, 'prepareReadingUnit'); assert.deepEqual(reading.result, {status: 'ready', plan: {kind: 'list', projectId: null, paperId: 'paper'}});
 });
