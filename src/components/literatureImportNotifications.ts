@@ -44,7 +44,7 @@ export function showImportJobNotification(
       className: "import-toast",
       description: sourceLabel(job.sourceKind),
       ...(job.sourceKind === "pdf"
-        ? { action: { label: "取消", onClick: actions.onCancel } }
+        ? { actions: [{ id: `cancel-import:${job.id}`, label: "取消", onClick: actions.onCancel }] }
         : {}),
     });
   }
@@ -71,7 +71,7 @@ export function showImportJobNotification(
     description: failedResultDescription(job),
     duration: Infinity,
     ...(retryableCount > 0
-      ? { action: { label: `重试 ${retryableCount} 项`, onClick: actions.onRetry } }
+      ? { actions: [{ id: `retry-import:${job.id}`, label: `重试 ${retryableCount} 项`, onClick: actions.onRetry }] }
       : {}),
   };
   const title = `导入结束 · ${job.completedCount}/${job.totalCount}`;

@@ -667,11 +667,12 @@ export function LiteratureWorkspace({ active = true, navigationTabId, onNavigate
     )) return;
     const operation = await gateway.mergeDuplicate(candidate.id, survivorItemId);
     notify.success(`已合并到“${survivorTitle}”；原条目已归档，所有来源关系均已保留`, {
-      action: {
+      actions: [{
+        id: `undo-merge:${operation.id}`,
         label: "撤销合并",
         onClick: () => void undoDuplicateMerge(operation).catch((reason: unknown) =>
           setError(reason instanceof Error ? reason.message : String(reason))),
-      },
+      }],
       duration: 8_000,
     });
     await Promise.all([refresh(query), refreshDuplicates(), refreshMergeHistory()]);
@@ -735,11 +736,12 @@ export function LiteratureWorkspace({ active = true, navigationTabId, onNavigate
     const archivedId = selected.id;
     await gateway.archive(archivedId);
     notify.success("文献已归档（未删除原始附件）", {
-      action: {
+      actions: [{
+        id: `undo-archive:${archivedId}`,
         label: "撤销归档",
         onClick: () => void undoArchive(archivedId).catch((reason: unknown) =>
           setError(reason instanceof Error ? reason.message : String(reason))),
-      },
+      }],
       duration: 8_000,
     });
     await refresh(query);
