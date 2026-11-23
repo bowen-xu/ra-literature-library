@@ -34,3 +34,4 @@ export * from './paper-confirmation.mts';
 export * from './attachments.mts';
 export * from './reading-history.mts';
 export * from './concepts.mts';
+export * from './analysis-history.mts';
