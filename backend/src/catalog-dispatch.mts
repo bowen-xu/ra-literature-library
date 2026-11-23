@@ -20,6 +20,7 @@ import {decideDerivedView, type DerivedViewInput} from './derived-view.mts';
 import {decideSemanticIndex, type SemanticIndexInput} from './semantic-index.mts';
 import {finishDuplicateDecision, prepareDuplicateDecision, prepareDuplicateMerge, type DuplicateDecisionRequest, type FinishDuplicateDecisionInput, type MergePrepareInput} from './duplicate-decisions.mts';
 import {decodePdfImportCandidate, preparePdfImportHeader, type PdfImportCandidate} from './pdf-import.mts';
+import {preparePaperConfirmation, type PaperConfirmationInput} from './paper-confirmation.mts';
 
 export interface CatalogDispatchRequest {readonly operation: string; readonly input: unknown}
 export interface CatalogDispatchResult {readonly operation: CatalogOperation; readonly input: unknown; readonly result: unknown}
@@ -55,6 +56,7 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
     case 'prepareDuplicateMerge': result = prepareDuplicateMerge(request.input as MergePrepareInput); break;
     case 'preparePdfImportHeader': result = preparePdfImportHeader((request.input as {readonly candidates: readonly PdfImportCandidate[]}).candidates); break;
     case 'decodePdfImportCandidate': result = decodePdfImportCandidate((request.input as {readonly rawInput: string}).rawInput); break;
+    case 'preparePaperConfirmation': result = preparePaperConfirmation(request.input as PaperConfirmationInput); break;
     case 'preparePaperContext': result = dispatchPaperContext(request.input as PaperContextDispatchInput); break;
     default: throw new Error(`literature_catalog_operation_unimplemented:${operation}`);
   }
