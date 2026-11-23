@@ -18,6 +18,7 @@ import {prepareReadingUnit, type ReadingUnitRequest} from './reading-units.mts';
 import {projectContextMetadata, type ContextMetadataInput} from './context-metadata.mts';
 import {decideDerivedView, type DerivedViewInput} from './derived-view.mts';
 import {decideSemanticIndex, type SemanticIndexInput} from './semantic-index.mts';
+import {finishDuplicateDecision, prepareDuplicateDecision, prepareDuplicateMerge, type DuplicateDecisionRequest, type FinishDuplicateDecisionInput, type MergePrepareInput} from './duplicate-decisions.mts';
 
 export interface CatalogDispatchRequest {readonly operation: string; readonly input: unknown}
 export interface CatalogDispatchResult {readonly operation: CatalogOperation; readonly input: unknown; readonly result: unknown}
@@ -48,6 +49,9 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
     case 'projectContextMetadata': result = projectContextMetadata(request.input as ContextMetadataInput); break;
     case 'decideDerivedView': result = decideDerivedView(request.input as DerivedViewInput); break;
     case 'prepareSemanticIndex': result = decideSemanticIndex(request.input as SemanticIndexInput); break;
+    case 'prepareDuplicateDecision': result = prepareDuplicateDecision(request.input as DuplicateDecisionRequest); break;
+    case 'finishDuplicateDecision': result = finishDuplicateDecision(request.input as FinishDuplicateDecisionInput); break;
+    case 'prepareDuplicateMerge': result = prepareDuplicateMerge(request.input as MergePrepareInput); break;
     case 'preparePaperContext': result = dispatchPaperContext(request.input as PaperContextDispatchInput); break;
     default: throw new Error(`literature_catalog_operation_unimplemented:${operation}`);
   }
