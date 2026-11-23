@@ -23,3 +23,4 @@ export * from './paper-context-prepare.mts';
 export * from './docling-evidence.mts';
 export * from './catalog-dispatch.mts';
 export * from './metadata.mts';
+export * from './candidate-revision.mts';
