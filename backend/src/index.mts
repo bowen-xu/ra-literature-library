@@ -31,3 +31,4 @@ export * from './semantic-index.mts';
 export * from './duplicate-decisions.mts';
 export * from './pdf-import.mts';
 export * from './paper-confirmation.mts';
+export * from './attachments.mts';
