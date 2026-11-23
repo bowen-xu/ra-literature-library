@@ -12,3 +12,4 @@ export * from './nal-annotation.mts';
 export * from './review-selection.mts';
 export * from './trash-cleanup.mts';
 export * from './evidence-write.mts';
+export * from './evidence-matrix.mts';
