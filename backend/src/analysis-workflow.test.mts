@@ -7,7 +7,7 @@ import {PaperTaskPromptSerde} from '../../../../ra-workbench-sdk/packages/workbe
 import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
-import {buildDoclingPrompt, candidateRecovery, decideAnalysisWorkflow, decideTemplate, legacyPrompt, overviewTask, planAttempt, selectPages, selectionPreview, submissionScope, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
+import {buildDoclingPrompt, candidateRecovery, decideAnalysisWorkflow, decideTemplate, legacyPrompt, overviewTask, planAttempt, researchMessages, selectPages, selectionPreview, submissionScope, suggestionMessages, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateResearchBundle, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
 
 test('analysis workflow validation preserves original gates', () => {
   assert.deepEqual(validateStart(0n, false), {kind: 'invalidInput', message: '阅读框架尚未确认，无法启动论文分析'});
@@ -109,4 +109,13 @@ test('analysis workflow builds a bounded Docling provider prompt', () => {
   const result = buildDoclingPrompt({items: [{id: 'item', paperId: 'paper', attachmentId: 'attachment', contentSha256: 'sha', parseRunId: 'run', rawRef: 'ref', kind: 'text', label: null, pageIndex: 0, regions: [], charspan: null, sourceTextHash: null, text: 'Context text', tableJson: null}], assets: {}, profile: {paperTemplate: null, paperId: 'paper', selectionRevision: 1n, profileRefs: [], fieldKinds: ['question']}, evidence: [{citationKey: 'item', quoteExact: 'Context text'}]});
   assert.equal('Ok' in result, true);
   if ('Ok' in result) {assert.match(result.Ok.auditText, /paper_overview_unit_v1/); assert.match(result.Ok.auditText, /Context text/); assert.equal(result.Ok.messages[0]!.images.length, 0);}
+});
+
+test('analysis workflow preserves research and suggestion prompt contracts', () => {
+  const item = {citationKey: 'ev', paperId: 'paper', paperTitle: 'Paper', quoteExact: 'Quote', contextText: 'Context', contentSha256: 'a'.repeat(64), pageIndex: 1n, validationStatus: 'valid'};
+  const research = {taskKind: 'reference_extraction', userGoal: 'Goal', matrixContext: null, validationStatus: 'valid', items: [item, {...item, citationKey: 'ev2'}]};
+  assert.equal(validateResearchBundle(research), null);
+  const messages = researchMessages(research); assert.equal('Ok' in messages, true); if ('Ok' in messages) {assert.match(messages.Ok.systemText, /reference_record_candidate_v1/); assert.equal(JSON.parse(messages.Ok.userText).evidence.length, 2);}
+  const suggestions = suggestionMessages([{citationKey: 'ev', anchorId: 'a', paperTitle: 'Paper', attachmentId: 'att', contentSha256: 'a'.repeat(64), pageIndex: 1n, pageLabel: '2', quoteExact: 'Quote', contextText: 'Context', relationKind: 'direct_quote'}], 'Goal', 'concept_suggestion_v1');
+  assert.equal('Ok' in suggestions, true); assert.deepEqual(suggestionMessages([], 'Goal', 'unknown'), {Err: {kind: 'invalidInput', message: '建议候选类型不受支持'}});
 });
