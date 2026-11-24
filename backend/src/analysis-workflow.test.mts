@@ -3,10 +3,11 @@ import test from 'node:test';
 import {createHash} from 'node:crypto';
 import {CandidatePayloadSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/candidate-contracts/payloads.js';
 import {AiTaskSpecDraftSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/generation.js';
+import {PaperTaskPromptSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/prompt.js';
 import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
-import {candidateRecovery, decideAnalysisWorkflow, decideTemplate, overviewTask, selectPages, selectionPreview, submissionScope, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
+import {candidateRecovery, decideAnalysisWorkflow, decideTemplate, legacyPrompt, overviewTask, planAttempt, selectPages, selectionPreview, submissionScope, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
 
 test('analysis workflow validation preserves original gates', () => {
   assert.deepEqual(validateStart(0n, false), {kind: 'invalidInput', message: '阅读框架尚未确认，无法启动论文分析'});
@@ -92,4 +93,14 @@ test('analysis workflow builds the original overview task draft', () => {
   const encoded = overviewTask({paperId: 'paper', attachmentIds: ['second', 'first'], selectionRevision: 7n, template: null, modelSelection: {providerId: 'provider', modelId: 'model', reasoningEffort: 'high'}});
   const draft = decodePayload(encoded, AiTaskSpecDraftSerde) as any;
   assert.equal(draft.taskKind, 'paper_overview'); assert.equal(draft.promptVersion, 'paper-overview-docling-context-v3'); assert.equal(draft.overviewProfileSelectionRevision, 7n); assert.deepEqual(draft.scopeItems.map((item: any) => item.objectId), ['second', 'first']);
+});
+
+test('analysis workflow preserves attempt eligibility and legacy prompt filtering', () => {
+  assert.equal(validateAttemptTurn('paper_overview'), null);
+  assert.deepEqual(validateAttemptTurn('other'), {kind: 'invalidInput', message: '未知论文分析阶段'});
+  assert.deepEqual(validateAttemptMessages([' ', 'x']), {kind: 'invalidInput', message: '论文分析规范化消息为空或超过上限'});
+  const workflow = {status: 'running', turns: [{id: 'turn', kind: 'paper_overview', status: 'pending', attemptNumbers: [0n]}]};
+  assert.deepEqual(planAttempt('paper_overview', workflow), {Ok: {turnId: 'turn', nextAttempt: 1n}});
+  const encoded = legacyPrompt([{kind: 'system_context', content: 'system', sourceTurnId: null}, {kind: 'task_prompt', content: 'first', sourceTurnId: null}, {kind: 'task_prompt', content: 'second', sourceTurnId: null}]);
+  assert.equal(decodePayload(encoded, PaperTaskPromptSerde).text, 'first\n\nsecond');
 });
