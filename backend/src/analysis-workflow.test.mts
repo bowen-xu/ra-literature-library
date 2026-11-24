@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import {createHash} from 'node:crypto';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
-import {decideAnalysisWorkflow, submissionScope, validateDoclingImages, validateDoclingSources, validateDraft, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
+import {candidateRecovery, decideAnalysisWorkflow, submissionScope, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
 
 test('analysis workflow validation preserves original gates', () => {
   assert.deepEqual(validateStart(0n, false), {kind: 'invalidInput', message: '阅读框架尚未确认，无法启动论文分析'});
@@ -33,4 +34,14 @@ test('analysis workflow preserves Docling and explicit submission scope gates', 
   assert.deepEqual(submissionScope('reference_extraction', [], []), {error: {kind: 'invalidInput', message: '生成任务没有文献原文依据'}});
   const scope = submissionScope('paper_profile_classification', ['paper'], ['attachment']);
   assert.equal('result' in scope ? scope.result.kind : '', 'portrait');
+});
+
+test('analysis workflow preserves portrait, recovery and running-generation semantics', () => {
+  assert.deepEqual(validatePortraitSources([], 0n), {kind: 'invalidInput', message: '来源文件尚无可读取的解析内容'});
+  assert.deepEqual(validatePortraitEvidence('partial', 1n), {kind: 'invalidInput', message: '来源文件没有可用依据'});
+  assert.deepEqual(validatePortraitPaper('Ω'.repeat(257)), {kind: 'invalidInput', message: '文献身份无效'});
+  assert.deepEqual(validateGeneration(true, false), {kind: 'invalidInput', message: '本文生成任务仍在运行，请先等待结束或取消。'});
+  const payload = '{"kind":"paper_overview_unit_v1","schemaVersion":1}';
+  const hash = createHash('sha256').update(payload).digest('hex');
+  assert.deepEqual(candidateRecovery({taskKind: 'paper_overview', candidateKind: 'paper_overview_unit_v1', originalPayloadHash: hash, revisionPayloadHash: hash, payloadJson: payload}), {expectedWorkflowStatus: 'failed', runningWorkflowStatus: 'overview_running', completionWithConcept: 'overview_ready', completionWithoutConcept: 'needs_review', recoveryReasons: ['validated_candidate_committed_without_matching_workflow', 'validated_candidate_committed_before_post_commit_read_failed', 'validated_candidate_committed_with_ambiguous_workflow']});
 });
