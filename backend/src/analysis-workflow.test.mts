@@ -171,3 +171,27 @@ test('analysis workflow validates accepted reading-unit content before storage',
   const draft = {projectId: null, paperId: 'paper', unitKind: 'other', title: 'Title', body: 'Body', provenanceKind: 'ai_accepted_unchanged', epistemicRole: 'synthesis', anchorIds: ['a'], candidateId: 'candidate', candidateRevision: 1n};
   assert.deepEqual(genericReview({kind: 'readingUnitValidation', ordinal: 0n, draft}), {kind: 'readingUnitValidation', rejection: null});
 });
+
+test('analysis workflow prepares reference promotion plans with accepted provenance', () => {
+  const input = {
+    kind: 'referencePromotion' as const,
+    input: {
+      reference: {kind: 'reference_record_candidate_v1', schemaVersion: 1n, rawText: 'Author. Title. 2024.', evidenceItemIds: ['ev'], fields: [{name: 'title', value: 'Title', evidenceItemIds: ['ev']}], uncertainties: []},
+      sources: [{paperId: 'paper', anchorId: 'anchor', relationKind: 'direct_quote'}],
+      provenanceKind: 'ai_accepted_unchanged',
+      candidateId: 'candidate',
+      candidateRevision: 3n,
+    },
+  };
+  const result = genericReview(input);
+  assert.equal(result.kind, 'referencePromotion');
+  assert.equal('Ok' in result.result, true);
+  if ('Ok' in result.result) {
+    assert.equal(result.result.Ok.provenanceKind, 'ai_accepted_unchanged');
+    assert.equal(result.result.Ok.candidateRevision, 3n);
+    assert.equal(result.result.Ok.record.draft.citingPaperId, 'paper');
+    assert.deepEqual(result.result.Ok.record.draft.fields, [{name: 'title', value: 'Title', sourceKind: 'ai_inference', confirmedByUser: false}]);
+    assert.equal(JSON.parse(result.result.Ok.record.snapshotJson).acceptedFrom.candidateId, 'candidate');
+  }
+  assert.deepEqual(genericReview({...input, input: {...input.input, provenanceKind: 'manual'}} as any), {kind: 'referencePromotion', result: {Err: {kind: 'invalidInput', detail: 'AI 参考条目审查来源无效'}}});
+});
