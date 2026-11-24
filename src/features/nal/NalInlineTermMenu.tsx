@@ -1,17 +1,19 @@
 import type { NalDisplayVocabulary } from "./nalPaperCitation";
 import { Check, Minus } from "lucide-react";
-import { useLayoutEffect, useRef, useState, type ReactNode, type Ref } from "react";
+import { useLayoutEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import type { NalPattern } from "@research-assistant/core/nal";
 import { NoteActionMenu, NoteActionMenuItem } from "@research-assistant/workbench-sdk/block-controls";
 import { NalAtomicSearch } from "./NalAtomicSearch";
 import { useNalEditorPolicy } from "./NalEditorPolicy";
+
+type NoteActionTriggerRef = ComponentProps<typeof NoteActionMenu>["triggerRef"];
 
 /** Every choice commits directly. Only free text waits for Enter, with Esc cancellation. */
 export function NalInlineTermMenu({ value, label, display, vocabulary, depth, onChange, disabled, triggerRef, onRemoveSlot }: {
   readonly value: NalPattern; readonly label: string; readonly display: ReactNode;
   readonly vocabulary: readonly NalDisplayVocabulary[]; readonly depth: number;
   readonly onChange: (value: NalPattern) => void; readonly disabled: boolean;
-  readonly triggerRef: Ref<HTMLButtonElement>;
+  readonly triggerRef: NoteActionTriggerRef;
   readonly onRemoveSlot?: () => void;
 }): React.JSX.Element {
   const policy = useNalEditorPolicy();
@@ -26,7 +28,7 @@ export function NalInlineTermMenu({ value, label, display, vocabulary, depth, on
   const changeOpen = (next: boolean): void => { setOpen(next); if (!next) setPage("root"); };
   const commit = (next: NalPattern): void => { onChange(next); changeOpen(false); };
   return <NoteActionMenu className="nal-inline-choice" label={label} trigger={display} triggerClassName="nal-inline-token"
-    menuLabel={page === "root" ? label : `${label} ${page}`} triggerRef={triggerRef} disabled={disabled} open={open} setOpen={changeOpen} portal>
+    menuLabel={page === "root" ? label : `${label} ${page}`} {...(triggerRef === undefined ? {} : {triggerRef})} disabled={disabled} open={open} setOpen={changeOpen} portal>
     {page !== "root" ? <div ref={choices}>
         {page === "atomic" ? <>
           {(query || policy.paperBinding) && <NoteActionMenuItem role="menuitemradio" aria-checked={value.kind === "variable"}
