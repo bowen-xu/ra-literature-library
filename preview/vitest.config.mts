@@ -5,10 +5,14 @@ import preview from "./vite.config.mts";
 
 const require = createRequire(import.meta.url);
 const reactEntries = ["react", "react/jsx-runtime", "react/jsx-dev-runtime", "react-dom", "react-dom/client", "react-dom/test-utils", "lucide-react"];
+const escapeAlias = (value: string) => value.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&");
 export default defineConfig({...preview,
   resolve: {...preview.resolve, alias: [
     ...reactEntries.map(name => ({find: new RegExp("^" + name.replaceAll("/", "\\/") + "$"), replacement: require.resolve(name)})),
-    ...Object.entries(preview.resolve.alias).map(([find, replacement]) => ({find, replacement})),
+    ...Object.entries(preview.resolve.alias).map(([find, replacement]) => ({
+      find: find.endsWith("$") ? new RegExp("^" + escapeAlias(find.slice(0, -1)) + "$") : find,
+      replacement,
+    })),
   ]},
   test: {
   include: ["tests/**/*.test.{ts,tsx}"],
