@@ -7,7 +7,7 @@ import {PaperTaskPromptSerde} from '../../../../ra-workbench-sdk/packages/workbe
 import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
-import {buildDoclingPrompt, candidateRecovery, completionProjection, decideAnalysisWorkflow, decideTemplate, doclingRowDecision, legacyPrompt, matrixContext, matrixEvidence, overviewTask, packSources, planAttempt, researchMessages, selectPages, selectionPreview, submissionScope, suggestionMessages, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateResearchBundle, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
+import {buildDoclingPrompt, candidateRecovery, completionProjection, decideAnalysisWorkflow, decideTemplate, doclingRowDecision, genericReview, legacyPrompt, matrixContext, matrixEvidence, overviewTask, packSources, planAttempt, researchMessages, selectPages, selectionPreview, submissionScope, suggestionMessages, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateResearchBundle, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
 
 test('analysis workflow validation preserves original gates', () => {
   assert.deepEqual(validateStart(0n, false), {kind: 'invalidInput', message: '阅读框架尚未确认，无法启动论文分析'});
@@ -148,4 +148,11 @@ test('analysis workflow preserves completion template and retained-field project
   const result = completionProjection({kind: 'structuredReading', content: {template: {fields: [{id: 'q', title: 'Q', question: 'Question', color: null}]}, retainedFields: ['x'], body: 'body'}, template: {kind: 'required', content: {fields: [{id: 'q', title: 'Q', question: 'Question', color: null}]}} as any} as any);
   assert.deepEqual(result, {Ok: '{"template":{"fields":[{"id":"q","title":"Q","question":"Question","color":null}]},"body":"body"}'});
   assert.deepEqual(completionProjection({kind: 'structuredReading', content: {template: {fields: []}}, template: {kind: 'required', content: {fields: [{id: 'q'}]}} as any} as any), {Err: {kind: 'invalidInput', message: '画像已保存，但本文阅读模板尚未成功保存；请在内部对话继续完成待审修改'}});
+});
+
+test('analysis workflow preserves generic candidate review action semantics', () => {
+  const draft = {candidateId: 'candidate', candidateRevision: 1n, action: 'accept_unchanged', rationale: ' rationale ', idempotencyKey: 'key', readingUnitTitle: null, projectId: null};
+  const observation = {candidateKind: 'paper_overview_unit_v1', currentRevision: 1n, reviewState: 'unreviewed', hasActiveConfirmations: false, hasRevisionItemDecisions: false, currentEditorKind: 'ai'};
+  assert.deepEqual(genericReview({kind: 'candidate', draft, observation}), {kind: 'candidate', result: {Ok: {reviewState: 'accepted_unchanged', provenance: 'ai_accepted_unchanged', requiresInspection: true, requiresCitations: true}}});
+  assert.deepEqual(genericReview({kind: 'inspection', inspected: false}), {kind: 'validated', rejection: {kind: 'invalidInput', detail: '原样接受前必须先打开至少一条候选证据'}});
 });
