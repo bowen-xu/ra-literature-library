@@ -187,6 +187,8 @@ test('analysis workflow prepares generic promotion units from selection candidat
 test('analysis workflow routes derived-view validation through the existing rule set', () => {
   const result = genericReview({kind: 'derivedValidation', input: {kind: 'provenance', provenanceKind: 'invalid'}} as any);
   assert.deepEqual(result, {kind: 'derivedValidation', rejection: {kind: 'invalidInput', detail: '派生视图校验失败：provenance'}});
+  const promotion = genericReview({kind: 'derivedPromotion', input: {view: {kind: 'derived_research_view_v1', schemaVersion: 1n, viewKind: 'taxonomy', title: 'Taxonomy', scopeNote: 'Scope', items: [{id: 'item', text: 'Text', epistemicRole: 'synthesis', evidenceItemIds: ['ev'], hasConflict: false}]}, context: {projectId: 'project', matrixId: 'matrix', matrixRevision: 1n, viewKind: 'taxonomy', title: 'Taxonomy', scopeNote: 'Scope', inputs: []}, projectId: 'project', anchorsByKey: [['ev', 'anchor']], provenanceKind: 'ai_accepted_after_edit', providerId: 'provider', modelId: 'model', generatedAt: 'now', candidateId: 'candidate', candidateRevision: 2n}} as any);
+  assert.equal(promotion.kind, 'derivedPromotion'); assert.equal('Ok' in promotion.result, true); if ('Ok' in promotion.result) assert.deepEqual(promotion.result.Ok.items[0].evidenceAnchorIds, ['anchor']);
 });
 
 test('analysis workflow validates accepted reading-unit content before storage', () => {
