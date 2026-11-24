@@ -5,7 +5,7 @@ import {CandidatePayloadSerde} from '../../../../ra-workbench-sdk/packages/workb
 import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
-import {candidateRecovery, decideAnalysisWorkflow, decideTemplate, submissionScope, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
+import {candidateRecovery, decideAnalysisWorkflow, decideTemplate, selectPages, selectionPreview, submissionScope, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
 
 test('analysis workflow validation preserves original gates', () => {
   assert.deepEqual(validateStart(0n, false), {kind: 'invalidInput', message: '阅读框架尚未确认，无法启动论文分析'});
@@ -73,4 +73,16 @@ test('analysis workflow preserves template availability and binding gates', () =
   const resolved = decideTemplate({kind: 'resourceContent', paperId: 'paper', reference, selectionRevision: 3n, raw: JSON.stringify({fields: [{id: 'question', title: 'Question', question: 'What?', color: null, claimIds: ['old']}]} )});
   assert.equal(resolved.kind, 'resolved');
   if (resolved.kind === 'resolved') assert.deepEqual(resolved.profile.fieldKinds, ['question']);
+});
+
+test('analysis workflow ranks page evidence and preserves selected-anchor limits', () => {
+  const attachment = {paperId: 'paper', paperTitle: 'Paper', contentSha256: 'sha', indexState: 'completed'} as const;
+  const selected = selectPages(attachment, 'attachment', [[2n, 'ordinary'], [0n, 'Abstract and research question'], [1n, 'Methods and results']]);
+  assert.equal(selected.ok, true);
+  if (selected.ok) {assert.deepEqual(selected.sources.map(source => source.pageIndex), [0n, 1n, 2n]); assert.equal(selected.sources[0]!.anchorId.startsWith('ai-overview-'), true);}
+  assert.deepEqual(selectionPreview(null), {Err: {kind: 'invalidInput', message: '原文锚点或对应附件版本已不可用'}});
+  const source = {anchorId: 'a', paperId: 'paper', paperTitle: 'Paper', attachmentId: 'attachment', contentSha256: 'sha', pageIndex: 0n, pageLabel: '1', quoteExact: 'Quote', quotePrefix: 'before ', quoteSuffix: ' after'} as const;
+  const preview = selectionPreview(source);
+  assert.equal('Ok' in preview ? preview.Ok.length : 0, 2);
+  assert.equal('Ok' in preview ? preview.Ok[1]!.contextText : '', 'before Quote after');
 });
