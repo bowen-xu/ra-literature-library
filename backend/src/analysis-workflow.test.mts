@@ -161,3 +161,8 @@ test('analysis workflow prepares generic promotion units from selection candidat
   const result = genericReview({kind: 'genericPromotion', input: {payload: {kind: 'selection_explanation_v1', statements: [{text: 'Reason', epistemicRole: 'source_paraphrase'}], uncertainties: ['Limit']}, readingUnitTitle: '  Title ', projectId: null, paperId: 'paper', anchorIds: ['a'], provenanceKind: 'ai_accepted_unchanged', candidateId: 'candidate', candidateRevision: 1n}});
   assert.equal(result.kind, 'genericPromotion'); assert.equal('Ok' in result.result, true); if ('Ok' in result.result) {assert.equal(result.result.Ok.kind, 'readingUnits'); assert.equal(result.result.Ok.units[0]!.title, 'Title'); assert.match(result.result.Ok.units[0]!.body, /尚待确认/);}
 });
+
+test('analysis workflow routes derived-view validation through the existing rule set', () => {
+  const result = genericReview({kind: 'derivedValidation', input: {kind: 'provenance', provenanceKind: 'invalid'}} as any);
+  assert.deepEqual(result, {kind: 'derivedValidation', rejection: {kind: 'invalidInput', detail: '派生视图校验失败：provenance'}});
+});
