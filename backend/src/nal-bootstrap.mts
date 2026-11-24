@@ -313,7 +313,7 @@ function finishProjection(source: BootstrapSourceV1, concepts: readonly Prepared
 export function prepareNalBootstrap(input: BootstrapInputV1): BootstrapPreparationV1 {
   const planner = new Planner(input), imported = importFields(), repairActive = {value: false}, relation = {value: null as string | null}, rewrites: RawNalStatement[] = [];
   const expected = prepareNalBootstrapProbes(input.source);
-  let terminal: BootstrapStopV1 | null = keyOf(expected) !== keyOf(input.probes) || input.identities.statementIds.length !== Number(input.probes.statementCount)
+  let terminal: BootstrapStopV1 | null = keyOf(expected) !== keyOf(input.probes) || BigInt(input.identities.statementIds.length) !== input.probes.statementCount
     ? stop('legacyHeader', {kind: 'invalidBinding'}) : null;
   if (!terminal) terminal = importLegacy(planner, imported);
   if (!terminal) terminal = repairLegacy(planner, repairActive, relation, rewrites);
