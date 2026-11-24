@@ -5,7 +5,7 @@ import {CandidatePayloadSerde} from '../../../../ra-workbench-sdk/packages/workb
 import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
-import {candidateRecovery, decideAnalysisWorkflow, submissionScope, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
+import {candidateRecovery, decideAnalysisWorkflow, decideTemplate, submissionScope, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
 
 test('analysis workflow validation preserves original gates', () => {
   assert.deepEqual(validateStart(0n, false), {kind: 'invalidInput', message: '阅读框架尚未确认，无法启动论文分析'});
@@ -63,4 +63,14 @@ test('analysis workflow decodes candidate JSON and retains candidate wire policy
   const prepared = decideCandidate({kind: 'finalize', payloadCborBase64: decoded.payloadCborBase64, matrix: null});
   assert.equal(prepared.kind, 'prepared');
   if (prepared.kind === 'prepared') assert.equal(JSON.parse(prepared.canonicalJson).kind, 'paper_overview_unit_v1');
+});
+
+test('analysis workflow preserves template availability and binding gates', () => {
+  assert.deepEqual(decideTemplate({kind: 'legacyAvailability', managedResources: true}), {kind: 'rejected', error: {kind: 'invalidInput', message: '旧画像模板标识仅用于历史读取；请先确认或采用已发布的资源模板，再开始新提取'}});
+  const reference = {templateResourceId: 'resource', templateResourceRevision: 2n} as const;
+  assert.deepEqual(decideTemplate({kind: 'resourceBinding', reference, selectionRevision: 3n, binding: ['resource', 2n]}), {kind: 'verified'});
+  assert.deepEqual(decideTemplate({kind: 'resourceBinding', reference, selectionRevision: 3n, binding: ['resource', 1n]}), {kind: 'rejected', error: {kind: 'invalidInput', message: '本文采用的模板版本已变化，请重新载入'}});
+  const resolved = decideTemplate({kind: 'resourceContent', paperId: 'paper', reference, selectionRevision: 3n, raw: JSON.stringify({fields: [{id: 'question', title: 'Question', question: 'What?', color: null, claimIds: ['old']}]} )});
+  assert.equal(resolved.kind, 'resolved');
+  if (resolved.kind === 'resolved') assert.deepEqual(resolved.profile.fieldKinds, ['question']);
 });
