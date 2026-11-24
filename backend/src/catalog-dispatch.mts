@@ -34,6 +34,8 @@ import type {DataRows} from '../../../../ra-workbench-sdk/packages/workbench-bac
 import {decidePaperRetrieval, type PaperRetrievalInput} from './paper-retrieval.mts';
 import {projectImportJobs, type ImportJobsProjectionInput} from './import-jobs.mts';
 import {prepareNalBootstrapProbes, type BootstrapSource} from './nal-bootstrap-probes.mts';
+import {prepareNalBootstrap} from './nal-bootstrap.mts';
+import type {BootstrapInputV1} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/src/nal-bootstrap.js';
 
 export interface CatalogDispatchRequest {readonly operation: string; readonly input: unknown}
 export interface CatalogDispatchResult {readonly operation: CatalogOperation; readonly input: unknown; readonly result: unknown}
@@ -59,6 +61,7 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
     case 'decidePaperRetrievalTrace': result = decidePaperRetrieval(request.input as PaperRetrievalInput); break;
     case 'projectImportJobs': result = projectImportJobs(request.input as ImportJobsProjectionInput); break;
     case 'prepareNalBootstrapProbes': result = prepareNalBootstrapProbes(request.input as BootstrapSource); break;
+    case 'prepareNalBootstrap': result = prepareNalBootstrap(request.input as BootstrapInputV1); break;
     case 'prepareBrowserCapture': result = prepareBrowserCapture(request.input as BrowserCaptureInput); break;
     case 'prepareLiteratureLifecycle': result = prepareLifecycle(request.input as LifecycleRequest); break;
     case 'prepareTrashCleanup': result = prepareTrashCleanup(); break;

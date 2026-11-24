@@ -67,33 +67,33 @@ function semanticSpace(source: SourceProbe<ConfiguredEmbedding | null>): SourceP
 
 export function prepareNalBootstrapProbes(source: BootstrapSource): BootstrapProbePreparation {
   const out = {concepts: [] as ConceptIntent[], termKeys: [] as {readonly normalizedText: string; readonly language: string}[], statementCount: 0n, representationRenderVersion: RENDER_VERSION, semanticNamespace: 'accepted_concepts', semanticSpace: {state: 'skipped'} as SourceProbe<PreparedSemanticSpace | null>, earliestUnavailable: null as BootstrapPhase | null, terminal: null as BootstrapStop | null};
+  const finish = (): BootstrapProbePreparation => {if (out.concepts.length !== 0) out.semanticSpace = semanticSpace(source.configuredEmbedding); return out;};
   const legacyImported = requireProbe(source.legacyImported, 'legacyHeader');
-  if (typeof legacyImported !== 'boolean') {out.terminal = legacyImported; out.earliestUnavailable = legacyImported.reason.kind === 'deferred' ? legacyImported.phase : null; return out;}
+  if (typeof legacyImported !== 'boolean') {out.terminal = legacyImported; out.earliestUnavailable = legacyImported.reason.kind === 'deferred' ? legacyImported.phase : null; return finish();}
   if (!legacyImported) {
     const collections = requireProbe(source.collections, 'collections');
-    if (isStop(collections)) {out.terminal = collections; out.earliestUnavailable = collections.reason.kind === 'deferred' ? collections.phase : null; return out;}
+    if (isStop(collections)) {out.terminal = collections; out.earliestUnavailable = collections.reason.kind === 'deferred' ? collections.phase : null; return finish();}
     if (collections.length !== 0) {
-      for (const entry of [{key: {kind: 'membership'} as ConceptCallKey, label: '原归类', explanation: '从旧集合成员归属迁移；仅表示原有归类，不自动解释为所属领域。'}, {key: {kind: 'tagged'} as ConceptCallKey, label: '旧关系标注', explanation: '有序参数：文献、旧集合端点乘积、关系词项。保留原标签含义，不推断文献间关系。'}]) {const stop = intent(out, entry.key, entry.label, entry.explanation); if (stop !== null) {out.terminal = stop; return out;}}
-      for (const collection of collections) {const stop = intent(out, {kind: 'collection', sourceId: collection.id}, collection.name, `从原集合迁移。${collection.description}`); if (stop !== null) {out.terminal = stop; return out;}}
+      for (const entry of [{key: {kind: 'membership'} as ConceptCallKey, label: '原归类', explanation: '从旧集合成员归属迁移；仅表示原有归类，不自动解释为所属领域。'}, {key: {kind: 'tagged'} as ConceptCallKey, label: '旧关系标注', explanation: '有序参数：文献、旧集合端点乘积、关系词项。保留原标签含义，不推断文献间关系。'}]) {const stop = intent(out, entry.key, entry.label, entry.explanation); if (stop !== null) {out.terminal = stop; return finish();}}
+      for (const collection of collections) {const stop = intent(out, {kind: 'collection', sourceId: collection.id}, collection.name, `从原集合迁移。${collection.description}`); if (stop !== null) {out.terminal = stop; return finish();}}
       const linked = collections.filter(value => value.conceptId !== null).length;
-      if (linked !== 0) {const stop = intent(out, {kind: 'linkedPredicate'}, '旧概念关联', '旧集合对既有知识概念的可选引用；不合并两者身份。'); if (stop !== null) {out.terminal = stop; return out;} out.statementCount += BigInt(linked);}
+      if (linked !== 0) {const stop = intent(out, {kind: 'linkedPredicate'}, '旧概念关联', '旧集合对既有知识概念的可选引用；不合并两者身份。'); if (stop !== null) {out.terminal = stop; return finish();} out.statementCount += BigInt(linked);}
       const relationTypes = requireProbe(source.relationTypes, 'relationTypes');
-      if (isStop(relationTypes)) {out.terminal = relationTypes; out.earliestUnavailable = relationTypes.reason.kind === 'deferred' ? relationTypes.phase : null; return out;}
+      if (isStop(relationTypes)) {out.terminal = relationTypes; out.earliestUnavailable = relationTypes.reason.kind === 'deferred' ? relationTypes.phase : null; return finish();}
       for (const relation of relationTypes) {
-        if (relation.id === 'related-field') {const used = requireProbe(source.relatedFieldUsed, 'relatedFieldExistence'); if (typeof used !== 'boolean') {out.terminal = used; out.earliestUnavailable = used.reason.kind === 'deferred' ? used.phase : null; return out;} if (!used) continue;}
-        if (relation.id !== 'sub-field') {const stop = intent(out, {kind: 'typePredicate', sourceId: relation.id}, relation.name, `从旧集合关系迁移。反向显示：${relation.inverseName}；有向：${relation.directed}。`); if (stop !== null) {out.terminal = stop; return out;}}
+        if (relation.id === 'related-field') {const used = requireProbe(source.relatedFieldUsed, 'relatedFieldExistence'); if (typeof used !== 'boolean') {out.terminal = used; out.earliestUnavailable = used.reason.kind === 'deferred' ? used.phase : null; return finish();} if (!used) continue;}
+        if (relation.id !== 'sub-field') {const stop = intent(out, {kind: 'typePredicate', sourceId: relation.id}, relation.name, `从旧集合关系迁移。反向显示：${relation.inverseName}；有向：${relation.directed}。`); if (stop !== null) {out.terminal = stop; return finish();}}
       }
       const relations = requireProbe(source.relations, 'relations');
-      if (isStop(relations)) {out.terminal = relations; out.earliestUnavailable = relations.reason.kind === 'deferred' ? relations.phase : null; return out;}
-      if (relations.some(value => value.typeId === 'sub-field')) {const stop = intent(out, {kind: 'subFieldPredicate'}, '旧上下位关系', '从旧集合 sub-field 迁移的有向二元关系；不作为继承，传递性需显式定义。'); if (stop !== null) {out.terminal = stop; return out;}}
+      if (isStop(relations)) {out.terminal = relations; out.earliestUnavailable = relations.reason.kind === 'deferred' ? relations.phase : null; return finish();}
+      if (relations.some(value => value.typeId === 'sub-field')) {const stop = intent(out, {kind: 'subFieldPredicate'}, '旧上下位关系', '从旧集合 sub-field 迁移的有向二元关系；不作为继承，传递性需显式定义。'); if (stop !== null) {out.terminal = stop; return finish();}}
       for (const relation of relations) out.statementCount += relation.typeId === 'sub-field' ? 1n : relationTypes.some(kind => kind.id === relation.typeId && !kind.directed) ? 2n : 1n;
-      const memberships = requireProbe(source.memberships, 'memberships'); if (isStop(memberships)) {out.terminal = memberships; out.earliestUnavailable = memberships.reason.kind === 'deferred' ? memberships.phase : null; return out;} out.statementCount += BigInt(memberships.length);
-      const assignments = requireProbe(source.assignments, 'assignments'); if (isStop(assignments)) {out.terminal = assignments; out.earliestUnavailable = assignments.reason.kind === 'deferred' ? assignments.phase : null; return out;} out.statementCount += BigInt(assignments.length);
+      const memberships = requireProbe(source.memberships, 'memberships'); if (isStop(memberships)) {out.terminal = memberships; out.earliestUnavailable = memberships.reason.kind === 'deferred' ? memberships.phase : null; return finish();} out.statementCount += BigInt(memberships.length);
+      const assignments = requireProbe(source.assignments, 'assignments'); if (isStop(assignments)) {out.terminal = assignments; out.earliestUnavailable = assignments.reason.kind === 'deferred' ? assignments.phase : null; return finish();} out.statementCount += BigInt(assignments.length);
     }
   }
   const repairVersion = requireProbe(source.repairVersion, 'repairVersion');
-  if (typeof repairVersion !== 'bigint') {out.terminal = repairVersion; out.earliestUnavailable = repairVersion.reason.kind === 'deferred' ? repairVersion.phase : null; return out;}
-  if (repairVersion !== 1n) {const records = requireProbe(source.repairRecords, 'repairRecords'); if (isStop(records)) {out.terminal = records; out.earliestUnavailable = records.reason.kind === 'deferred' ? records.phase : null; return out;} if (records.length !== 0) {const stop = intent(out, {kind: 'repairPredicate'}, '旧上下位关系', '从旧集合 sub-field 迁移的有向二元关系；不作为继承，传递性需显式定义。'); if (stop !== null) {out.terminal = stop; return out;}}}
-  if (out.concepts.length !== 0) out.semanticSpace = semanticSpace(source.configuredEmbedding);
-  return out;
+  if (typeof repairVersion !== 'bigint') {out.terminal = repairVersion; out.earliestUnavailable = repairVersion.reason.kind === 'deferred' ? repairVersion.phase : null; return finish();}
+  if (repairVersion !== 1n) {const records = requireProbe(source.repairRecords, 'repairRecords'); if (isStop(records)) {out.terminal = records; out.earliestUnavailable = records.reason.kind === 'deferred' ? records.phase : null; return finish();} if (records.length !== 0) {const stop = intent(out, {kind: 'repairPredicate'}, '旧上下位关系', '从旧集合 sub-field 迁移的有向二元关系；不作为继承，传递性需显式定义。'); if (stop !== null) {out.terminal = stop; return finish();}}}
+  return finish();
 }
