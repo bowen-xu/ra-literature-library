@@ -7,7 +7,7 @@ import {PaperTaskPromptSerde} from '../../../../ra-workbench-sdk/packages/workbe
 import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
-import {buildDoclingPrompt, candidateRecovery, decideAnalysisWorkflow, decideTemplate, legacyPrompt, matrixContext, overviewTask, planAttempt, researchMessages, selectPages, selectionPreview, submissionScope, suggestionMessages, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateResearchBundle, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
+import {buildDoclingPrompt, candidateRecovery, decideAnalysisWorkflow, decideTemplate, legacyPrompt, matrixContext, matrixEvidence, overviewTask, planAttempt, researchMessages, selectPages, selectionPreview, submissionScope, suggestionMessages, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateResearchBundle, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
 
 test('analysis workflow validation preserves original gates', () => {
   assert.deepEqual(validateStart(0n, false), {kind: 'invalidInput', message: '阅读框架尚未确认，无法启动论文分析'});
@@ -125,4 +125,9 @@ test('analysis workflow preserves matrix scope and context gates', () => {
   assert.deepEqual(matrixContext({kind: 'header', draft}), {kind: 'validated', rejection: null});
   assert.deepEqual(matrixContext({kind: 'revision', matches: false}), {kind: 'validated', rejection: {kind: 'invalidInput', message: '证据矩阵版本已变化，请重新预览综合范围'}});
   assert.deepEqual(matrixContext({kind: 'input', input: {objectKind: 'matrix_cell', objectId: 'cell', objectRevision: 1n, selectionReason: 'reason'}, priorCellIds: ['cell']}), {kind: 'validated', rejection: {kind: 'invalidInput', message: '多文献综合输入单元无效或重复'}});
+});
+
+test('analysis workflow preserves matrix anchor evidence limits', () => {
+  assert.deepEqual(matrixEvidence({kind: 'anchor', source: null}), {kind: 'validated', rejection: {kind: 'invalidInput', message: '多文献综合原文锚点或附件版本不可用'}});
+  assert.deepEqual(matrixEvidence({kind: 'frozenHash', expected: 'a', actual: 'b'}), {kind: 'validated', rejection: {kind: 'invalidInput', message: '多文献综合来源附件版本已变化'}});
 });
