@@ -7,7 +7,7 @@ import {PaperTaskPromptSerde} from '../../../../ra-workbench-sdk/packages/workbe
 import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
-import {candidateRecovery, decideAnalysisWorkflow, decideTemplate, legacyPrompt, overviewTask, planAttempt, selectPages, selectionPreview, submissionScope, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
+import {buildDoclingPrompt, candidateRecovery, decideAnalysisWorkflow, decideTemplate, legacyPrompt, overviewTask, planAttempt, selectPages, selectionPreview, submissionScope, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
 
 test('analysis workflow validation preserves original gates', () => {
   assert.deepEqual(validateStart(0n, false), {kind: 'invalidInput', message: '阅读框架尚未确认，无法启动论文分析'});
@@ -103,4 +103,10 @@ test('analysis workflow preserves attempt eligibility and legacy prompt filterin
   assert.deepEqual(planAttempt('paper_overview', workflow), {Ok: {turnId: 'turn', nextAttempt: 1n}});
   const encoded = legacyPrompt([{kind: 'system_context', content: 'system', sourceTurnId: null}, {kind: 'task_prompt', content: 'first', sourceTurnId: null}, {kind: 'task_prompt', content: 'second', sourceTurnId: null}]);
   assert.equal(decodePayload(encoded, PaperTaskPromptSerde).text, 'first\n\nsecond');
+});
+
+test('analysis workflow builds a bounded Docling provider prompt', () => {
+  const result = buildDoclingPrompt({items: [{id: 'item', paperId: 'paper', attachmentId: 'attachment', contentSha256: 'sha', parseRunId: 'run', rawRef: 'ref', kind: 'text', label: null, pageIndex: 0, regions: [], charspan: null, sourceTextHash: null, text: 'Context text', tableJson: null}], assets: {}, profile: {paperTemplate: null, paperId: 'paper', selectionRevision: 1n, profileRefs: [], fieldKinds: ['question']}, evidence: [{citationKey: 'item', quoteExact: 'Context text'}]});
+  assert.equal('Ok' in result, true);
+  if ('Ok' in result) {assert.match(result.Ok.auditText, /paper_overview_unit_v1/); assert.match(result.Ok.auditText, /Context text/); assert.equal(result.Ok.messages[0]!.images.length, 0);}
 });
