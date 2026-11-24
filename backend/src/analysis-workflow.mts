@@ -1,0 +1,31 @@
+import type {PaperAnalysisMessage, PaperAnalysisWorkflow} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/src/analysis-history/contracts.js';
+import type {AnalysisWorkflowError, FailureStatuses, PaperAnalysisWorkflowDraft} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/src/analysis-workflow.js';
+import {WorkflowInputV1Serde, WorkflowDecisionV1Serde, type WorkflowDecisionV1, type WorkflowInputV1, type WorkflowWireInputV1, type WorkflowWireOutcomeV1} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
+import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
+
+const invalid = (message: string): AnalysisWorkflowError => ({kind: 'invalidInput', message});
+export function validateStart(revision: bigint, hasTemplate: boolean): AnalysisWorkflowError | null {return revision < 1n && !hasTemplate ? invalid('阅读框架尚未确认，无法启动论文分析') : null;}
+export function validateSources(statuses: readonly string[], pictureCount: bigint): AnalysisWorkflowError | null {if (statuses.some(status => status !== 'available')) return invalid('部分 PDF 尚未完成 Docling 结构化解析'); return pictureCount > 128n ? invalid(`图片结构块数量为 ${pictureCount}，超过本轮上限 128`) : null;}
+export function validateReuse(regenerate: boolean, templateJson: string | null, existing: PaperAnalysisWorkflow | null): AnalysisWorkflowError | null {if (existing === null) return null; const sameTemplate = templateJson === null || existing.turns.some(turn => turn.kind === 'paper_overview' && turn.attempts.at(-1)?.normalizedMessages.some(message => message.content === templateJson)); const sameStages = !existing.turns.some(turn => turn.kind === 'paper_concept_map'); const emptyPreparing = existing.status === 'preparing' && existing.turns.every(turn => turn.attempts.length === 0); return !regenerate && sameTemplate && sameStages && !['failed', 'canceled'].includes(existing.status) && !emptyPreparing ? invalid('当前论文上下文已经存在分析工作流') : null;}
+export function validateDraft(draft: PaperAnalysisWorkflowDraft): AnalysisWorkflowError | null {return [draft.paperId, draft.contextSnapshotId, draft.providerId, draft.modelId, draft.promptSetVersion].some(value => value.trim() === '') ? invalid('论文分析工作流参数不完整') : null;}
+export function runningStatus(turnKind: string): string {return turnKind === 'paper_overview' ? 'overview_running' : 'concepts_running';}
+export function completionStatus(turnKind: string, hasConceptTurn: boolean): string {return turnKind === 'paper_overview' && hasConceptTurn ? 'overview_ready' : 'needs_review';}
+export function failureStatuses(turnKind: string, errorCode: string): FailureStatuses {const canceled = errorCode === 'canceled'; const interrupted = errorCode === 'interrupted'; return {attempt: canceled ? 'canceled' : interrupted ? 'interrupted' : 'failed', turn: canceled ? 'canceled' : interrupted ? 'interrupted' : 'failed', workflow: canceled ? 'canceled' : turnKind === 'paper_overview' ? 'failed' : interrupted ? 'partial' : 'partial'};}
+export function overviewMessages(workflow: PaperAnalysisWorkflow): readonly PaperAnalysisMessage[] {return [{kind: 'system_context', content: `Use immutable paper context snapshot ${workflow.contextSnapshotId} for paper ${workflow.paperId}.`, sourceTurnId: null}, {kind: 'task_prompt', content: 'Extract only the structured paper overview using the confirmed reading profile and source evidence IDs. Finish after this structured-reading result.', sourceTurnId: null}];}
+function decision(input: WorkflowInputV1): WorkflowDecisionV1 {
+  switch (input.kind) {
+    case 'validateStart': return {kind: 'validated', rejection: validateStart(input.revision, input.hasTemplate)};
+    case 'validateSources': return {kind: 'validated', rejection: validateSources(input.statuses, input.pictureCount)};
+    case 'validateReuse': return {kind: 'validated', rejection: validateReuse(input.regenerate, input.templateJson, input.existing)};
+    case 'validateDraft': return {kind: 'validated', rejection: validateDraft(input.draft)};
+    case 'overviewMessages': return {kind: 'messages', messages: overviewMessages(input.workflow)};
+    case 'runningStatus': return {kind: 'status', status: runningStatus(input.turnKind)};
+    case 'completionStatus': return {kind: 'status', status: completionStatus(input.turnKind, input.hasConceptTurn)};
+    case 'failureStatuses': return {kind: 'failure', statuses: failureStatuses(input.turnKind, input.errorCode)};
+    case 'selectConversation': return input.unarchived === null ? {kind: 'conversation', decision: {kind: 'create'}} : {kind: 'conversation', decision: {kind: 'reuse', conversationId: input.unarchived}};
+    case 'validateGeneration': return {kind: 'validated', rejection: input.portraitActive || input.analysisActive ? null : invalid('论文分析暂不可用')};
+    case 'validateTurn': return {kind: 'validated', rejection: input.turnKind.trim() === '' ? invalid('分析回合类型不能为空') : null};
+    default: throw new Error(`literature_analysis_workflow_unimplemented:${input.kind}`);
+  }
+}
+export function decideAnalysisWorkflow(input: WorkflowWireInputV1): WorkflowWireOutcomeV1 {const decoded = decodePayload(input.cborBase64, WorkflowInputV1Serde); return {input, decisionCborBase64: encodePayload(decision(decoded), WorkflowDecisionV1Serde)};}
