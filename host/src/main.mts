@@ -1,5 +1,7 @@
 import {createInterface} from 'node:readline';
 import {stdin, stdout} from 'node:process';
+import {realpathSync} from 'node:fs';
+import {pathToFileURL} from 'node:url';
 import {FileBackedCatalogRuntime, createFileBackedCatalogHandler} from './catalog-runtime.mts';
 import {LiteratureTraceHost} from './literature-trace-host.mts';
 import {decodeRequest, encodeResponse, type SnapshotRef} from '../../backend/src/literature-trace-protocol.mts';
@@ -32,6 +34,6 @@ export async function run(root = process.env.RESEARCH_ASSISTANT_PLUGIN_HOST_ROOT
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   run().catch(cause => {console.error(cause instanceof Error ? cause.message : String(cause)); process.exitCode = 2;});
 }
