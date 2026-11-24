@@ -156,3 +156,8 @@ test('analysis workflow preserves generic candidate review action semantics', ()
   assert.deepEqual(genericReview({kind: 'candidate', draft, observation}), {kind: 'candidate', result: {Ok: {reviewState: 'accepted_unchanged', provenance: 'ai_accepted_unchanged', requiresInspection: true, requiresCitations: true}}});
   assert.deepEqual(genericReview({kind: 'inspection', inspected: false}), {kind: 'validated', rejection: {kind: 'invalidInput', detail: '原样接受前必须先打开至少一条候选证据'}});
 });
+
+test('analysis workflow prepares generic promotion units from selection candidates', () => {
+  const result = genericReview({kind: 'genericPromotion', input: {payload: {kind: 'selection_explanation_v1', statements: [{text: 'Reason', epistemicRole: 'source_paraphrase'}], uncertainties: ['Limit']}, readingUnitTitle: '  Title ', projectId: null, paperId: 'paper', anchorIds: ['a'], provenanceKind: 'ai_accepted_unchanged', candidateId: 'candidate', candidateRevision: 1n}});
+  assert.equal(result.kind, 'genericPromotion'); assert.equal('Ok' in result.result, true); if ('Ok' in result.result) {assert.equal(result.result.Ok.kind, 'readingUnits'); assert.equal(result.result.Ok.units[0]!.title, 'Title'); assert.match(result.result.Ok.units[0]!.body, /尚待确认/);}
+});
