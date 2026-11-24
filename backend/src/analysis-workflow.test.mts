@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {createHash} from 'node:crypto';
+import {CandidatePayloadSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/candidate-contracts/payloads.js';
+import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
 import {candidateRecovery, decideAnalysisWorkflow, submissionScope, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
@@ -44,4 +46,21 @@ test('analysis workflow preserves portrait, recovery and running-generation sema
   const payload = '{"kind":"paper_overview_unit_v1","schemaVersion":1}';
   const hash = createHash('sha256').update(payload).digest('hex');
   assert.deepEqual(candidateRecovery({taskKind: 'paper_overview', candidateKind: 'paper_overview_unit_v1', originalPayloadHash: hash, revisionPayloadHash: hash, payloadJson: payload}), {expectedWorkflowStatus: 'failed', runningWorkflowStatus: 'overview_running', completionWithConcept: 'overview_ready', completionWithoutConcept: 'needs_review', recoveryReasons: ['validated_candidate_committed_without_matching_workflow', 'validated_candidate_committed_before_post_commit_read_failed', 'validated_candidate_committed_with_ambiguous_workflow']});
+});
+
+test('analysis workflow decodes candidate JSON and retains candidate wire policy', () => {
+  const payload = {kind: 'paper_overview_unit_v1', schemaVersion: 1, profileId: 'generic_overview_v1', fields: [
+    {field: 'research_question', status: 'not_found', statements: []}, {field: 'approach', status: 'not_found', statements: []}, {field: 'key_result', status: 'not_found', statements: []}, {field: 'conclusion', status: 'not_found', statements: []}, {field: 'limitation', status: 'not_found', statements: []}, {field: 'open_question', status: 'not_found', statements: []},
+  ]};
+  const fence = String.fromCharCode(96).repeat(3);
+  const decoded = decideCandidate({kind: 'decode', content: `before\n${fence}json\n${JSON.stringify(payload)}\n${fence}`, evidenceKeys: []});
+  assert.equal(decoded.kind, 'decoded');
+  if (decoded.kind !== 'decoded') return;
+  const wire = decodePayload(decoded.payloadCborBase64, CandidatePayloadSerde);
+  assert.equal((wire as any).PaperOverview.kind, 'paper_overview_unit_v1');
+  assert.deepEqual(decideCandidate({kind: 'kindAndQuotes', payloadCborBase64: decoded.payloadCborBase64, taskKind: 'paper_overview', suggestionKind: null, evidence: []}), {kind: 'validated'});
+  assert.deepEqual(decideCandidate({kind: 'kindAndQuotes', payloadCborBase64: decoded.payloadCborBase64, taskKind: 'paper_concept_map', suggestionKind: null, evidence: []}), {kind: 'rejected', error: {kind: 'invalidInput', detail: 'provider 候选类型与冻结的任务输出类型不一致'}});
+  const prepared = decideCandidate({kind: 'finalize', payloadCborBase64: decoded.payloadCborBase64, matrix: null});
+  assert.equal(prepared.kind, 'prepared');
+  if (prepared.kind === 'prepared') assert.equal(JSON.parse(prepared.canonicalJson).kind, 'paper_overview_unit_v1');
 });
