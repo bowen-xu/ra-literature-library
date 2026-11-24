@@ -3,7 +3,9 @@ import test from 'node:test';
 import {createHash} from 'node:crypto';
 import {CandidatePayloadSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/candidate-contracts/payloads.js';
 import {AiTaskSpecDraftSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/generation.js';
-import {PaperTaskPromptSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/prompt.js';
+import {PaperTaskPromptSerde, TaskPromptInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/prompt.js';
+import {AnalysisWorkflowErrorSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow.js';
+import {defineSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/serde.js';
 import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
@@ -23,6 +25,26 @@ test('analysis workflow wire round-trips finite status decisions', () => {
   const output = decideAnalysisWorkflow({cborBase64: encoded});
   const decision = decodePayload(output.decisionCborBase64, WorkflowDecisionV1Serde);
   assert.deepEqual(decision, {kind: 'status', status: 'overview_running'});
+});
+
+test('analysis workflow preserves task shape and prompt source bindings', () => {
+  const draft = decodePayload(overviewTask({paperId: 'paper', attachmentIds: ['attachment'], selectionRevision: 1n, template: null, modelSelection: null}), AiTaskSpecDraftSerde);
+  assert.deepEqual((draft as any).taskKind, 'paper_overview');
+  const taskShape = {kind: 'taskShape' as const, draftCborBase64: encodePayload(draft, AiTaskSpecDraftSerde)};
+  const shapeDecision = decodePayload(decideAnalysisWorkflow({cborBase64: encodePayload(taskShape, WorkflowInputV1Serde)}).decisionCborBase64, WorkflowDecisionV1Serde);
+  assert.deepEqual(shapeDecision, {kind: 'validated', rejection: null});
+  const promptInput = {taskTemplate: '{{ task }}\n{{ contract }}\n{{ preferences }}', readingContract: 'Schema: {{ schema }}', sources: [
+    {source: {sourceId: 'source', kind: 'userResource', resourceId: 'paper', revision: 'frozen', anchor: JSON.stringify({resourceKind: 'paper', sourceUrl: 'ignored'}), text: JSON.stringify({label: 'Paper Ω'})}, resource: {paper: {resourceId: 'paper', attachmentId: 'pdf'}}},
+    {source: {sourceId: 'target', kind: 'userResource', resourceId: 'reading', revision: 'frozen', anchor: JSON.stringify({resourceKind: 'structuredReading', contextAccess: 'readWrite', sourceUrl: 'source://library/paper/reading'}), text: JSON.stringify({label: 'Reading'})}, resource: 'other'},
+  ], kind: 'structuredReading', profile: null, preferences: '{"language":"zh"}'} as const;
+  const promptInputCbor = encodePayload(promptInput, TaskPromptInputV1Serde);
+  const promptDecision = decodePayload(decideAnalysisWorkflow({cborBase64: encodePayload({kind: 'renderPrompt', inputCborBase64: promptInputCbor}, WorkflowInputV1Serde)}).decisionCborBase64, WorkflowDecisionV1Serde);
+  assert.equal(promptDecision.kind, 'prompt');
+  if (promptDecision.kind !== 'prompt') return;
+  const result = decodePayload(promptDecision.resultCborBase64, defineSerde({kind: 'enum', variants: [{name: 'Ok', shape: {kind: 'ref', resolve: () => PaperTaskPromptSerde.shape}}, {name: 'Err', shape: {kind: 'ref', resolve: () => AnalysisWorkflowErrorSerde.shape}}]}));
+  assert.equal((result as any).Ok.text.includes('Paper Ω'), true);
+  assert.equal((result as any).Ok.userInput[0].textElements.length, 2);
+  assert.equal((result as any).Ok.userInput[1].target.revision, 'frozen');
 });
 
 test('analysis workflow reuse rejects only an equivalent active workflow', () => {
@@ -194,4 +216,13 @@ test('analysis workflow prepares reference promotion plans with accepted provena
     assert.equal(JSON.parse(result.result.Ok.record.snapshotJson).acceptedFrom.candidateId, 'candidate');
   }
   assert.deepEqual(genericReview({...input, input: {...input.input, provenanceKind: 'manual'}} as any), {kind: 'referencePromotion', result: {Err: {kind: 'invalidInput', detail: 'AI 参考条目审查来源无效'}}});
+});
+
+test('analysis workflow routes knowledge and typed review families through their original decisions', () => {
+  const knowledge = decodePayload(decideAnalysisWorkflow({cborBase64: encodePayload({kind: 'knowledgeValidation', ordinal: 0n, input: {kind: 'relationNode', nodeKind: 'paper', idIsEmpty: false, idBytes: 12n}}, WorkflowInputV1Serde)}).decisionCborBase64, WorkflowDecisionV1Serde);
+  assert.deepEqual(knowledge, {kind: 'knowledgeValidation', decision: {kind: 'relationNode', result: {Ok: 'paper'}}});
+  const suggestion = decodePayload(decideAnalysisWorkflow({cborBase64: encodePayload({kind: 'suggestionReview', input: {kind: 'state', total: 1n, terminal: 0n, accepted: 0n, editorKind: 'human', action: 'defer'}}, WorkflowInputV1Serde)}).decisionCborBase64, WorkflowDecisionV1Serde);
+  assert.deepEqual(suggestion, {kind: 'suggestionReview', decision: {kind: 'state', state: 'deferred'}});
+  const paper = decodePayload(decideAnalysisWorkflow({cborBase64: encodePayload({kind: 'paperConceptReview', input: {kind: 'paper', paperIds: ['paper']}}, WorkflowInputV1Serde)}).decisionCborBase64, WorkflowDecisionV1Serde);
+  assert.deepEqual(paper, {kind: 'paperConceptReview', decision: {kind: 'paper', result: {Ok: 'paper'}}});
 });
