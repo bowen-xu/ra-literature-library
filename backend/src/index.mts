@@ -38,3 +38,5 @@ export * from './analysis-history.mts';
 export * from './structured-validation.mts';
 export * from './editable-template.mts';
 export * from './research-export.mts';
+export * from './doi-metadata.mts';
+export * from './doi-preview.mts';
