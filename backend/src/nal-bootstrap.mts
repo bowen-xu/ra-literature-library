@@ -282,7 +282,7 @@ function repairLegacy(planner: Planner, active: {value: boolean}, relation: {val
   return null;
 }
 
-function projectRules(ids: readonly string[]): NalRule[] {return ids.map(id => ({id: `transitive:${id}`, kind: 'transitive', relationConceptId: id}));}
+export function projectRules(ids: readonly string[]): NalRule[] {return ids.map(id => ({id: `transitive:${id}`, kind: 'transitive', relationConceptId: id}));}
 function references(term: NalTerm, concept: string): boolean {return term.kind === 'concept' ? term.id === concept : term.kind === 'product' ? term.terms.some(item => references(item, concept)) : false;}
 function obsolete(concept: NalConcept): boolean {return concept.label === 'related-field' && ['旧集合关系。反向显示：related-field；有向：false。', '从旧集合关系迁移。反向显示：related-field；有向：false。'].includes(concept.explanation);}
 function decodeState(raw: MutableRawNalState): NalState {
