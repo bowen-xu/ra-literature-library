@@ -7,7 +7,7 @@ import {PaperTaskPromptSerde} from '../../../../ra-workbench-sdk/packages/workbe
 import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
-import {buildDoclingPrompt, candidateRecovery, decideAnalysisWorkflow, decideTemplate, legacyPrompt, matrixContext, matrixEvidence, overviewTask, packSources, planAttempt, researchMessages, selectPages, selectionPreview, submissionScope, suggestionMessages, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateResearchBundle, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
+import {buildDoclingPrompt, candidateRecovery, completionProjection, decideAnalysisWorkflow, decideTemplate, doclingRowDecision, legacyPrompt, matrixContext, matrixEvidence, overviewTask, packSources, planAttempt, researchMessages, selectPages, selectionPreview, submissionScope, suggestionMessages, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateResearchBundle, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
 
 test('analysis workflow validation preserves original gates', () => {
   assert.deepEqual(validateStart(0n, false), {kind: 'invalidInput', message: '阅读框架尚未确认，无法启动论文分析'});
@@ -136,4 +136,16 @@ test('analysis workflow freezes same-paper source bundles only', () => {
   const sources = [{sourceId: 'a', kind: 'paper' as const, resourceId: 'paper', revision: '1', anchor: null, text: 'A'}, {sourceId: 'b', kind: 'paper' as const, resourceId: 'paper', revision: '1', anchor: null, text: 'B'}];
   const packed = packSources(sources); assert.equal('Ok' in packed, true); if ('Ok' in packed) {assert.equal(packed.Ok.length, 1); assert.match(packed.Ok[0]!.sourceId, /^paper-bundle:/);}
   assert.deepEqual(packSources([sources[0]!, {...sources[1]!, resourceId: 'other'}]), {Err: {kind: 'invalidInput', message: '论文来源包不能混合不同文献或版本'}});
+});
+
+test('analysis workflow projects Docling evidence rows with page scoped regions', () => {
+  const item = {id: 'item', pageIndex: 2, regions: [{pageIndex: 2, rect: {x: 1, y: 2, width: 3, height: 4}}, {pageIndex: 3, rect: {x: 5, y: 6, width: 7, height: 8}}], kind: 'text', rawRef: 'ref', label: null, text: 'Quote', tableJson: null};
+  const result = doclingRowDecision({runId: 'run', item});
+  assert.equal(result.kind, 'ready'); assert.equal(result.row.anchorId, 'docling:run:item'); assert.equal(result.row.pageIndex, 2n); assert.equal(JSON.parse(result.row.rectsJson).length, 1);
+});
+
+test('analysis workflow preserves completion template and retained-field projection rules', () => {
+  const result = completionProjection({kind: 'structuredReading', content: {template: {fields: [{id: 'q', title: 'Q', question: 'Question', color: null}]}, retainedFields: ['x'], body: 'body'}, template: {kind: 'required', content: {fields: [{id: 'q', title: 'Q', question: 'Question', color: null}]}} as any} as any);
+  assert.deepEqual(result, {Ok: '{"template":{"fields":[{"id":"q","title":"Q","question":"Question","color":null}]},"body":"body"}'});
+  assert.deepEqual(completionProjection({kind: 'structuredReading', content: {template: {fields: []}}, template: {kind: 'required', content: {fields: [{id: 'q'}]}} as any} as any), {Err: {kind: 'invalidInput', message: '画像已保存，但本文阅读模板尚未成功保存；请在内部对话继续完成待审修改'}});
 });
