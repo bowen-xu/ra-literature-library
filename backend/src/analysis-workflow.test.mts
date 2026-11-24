@@ -166,3 +166,8 @@ test('analysis workflow routes derived-view validation through the existing rule
   const result = genericReview({kind: 'derivedValidation', input: {kind: 'provenance', provenanceKind: 'invalid'}} as any);
   assert.deepEqual(result, {kind: 'derivedValidation', rejection: {kind: 'invalidInput', detail: '派生视图校验失败：provenance'}});
 });
+
+test('analysis workflow validates accepted reading-unit content before storage', () => {
+  const draft = {projectId: null, paperId: 'paper', unitKind: 'other', title: 'Title', body: 'Body', provenanceKind: 'ai_accepted_unchanged', epistemicRole: 'synthesis', anchorIds: ['a'], candidateId: 'candidate', candidateRevision: 1n};
+  assert.deepEqual(genericReview({kind: 'readingUnitValidation', ordinal: 0n, draft}), {kind: 'readingUnitValidation', rejection: null});
+});
