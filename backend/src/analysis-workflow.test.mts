@@ -7,7 +7,7 @@ import {PaperTaskPromptSerde} from '../../../../ra-workbench-sdk/packages/workbe
 import {decideCandidate} from './analysis-workflow.mts';
 import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
 import {WorkflowDecisionV1Serde, WorkflowInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-workflow/wire.js';
-import {buildDoclingPrompt, candidateRecovery, decideAnalysisWorkflow, decideTemplate, legacyPrompt, overviewTask, planAttempt, researchMessages, selectPages, selectionPreview, submissionScope, suggestionMessages, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateResearchBundle, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
+import {buildDoclingPrompt, candidateRecovery, decideAnalysisWorkflow, decideTemplate, legacyPrompt, matrixContext, overviewTask, planAttempt, researchMessages, selectPages, selectionPreview, submissionScope, suggestionMessages, validateAttemptMessages, validateAttemptTurn, validateDoclingImages, validateDoclingSources, validateDraft, validateGeneration, validatePortraitEvidence, validatePortraitPaper, validatePortraitSources, validateResearchBundle, validateReuse, validateSources, validateStart, validateTaskScope} from './analysis-workflow.mts';
 
 test('analysis workflow validation preserves original gates', () => {
   assert.deepEqual(validateStart(0n, false), {kind: 'invalidInput', message: '阅读框架尚未确认，无法启动论文分析'});
@@ -118,4 +118,11 @@ test('analysis workflow preserves research and suggestion prompt contracts', () 
   const messages = researchMessages(research); assert.equal('Ok' in messages, true); if ('Ok' in messages) {assert.match(messages.Ok.systemText, /reference_record_candidate_v1/); assert.equal(JSON.parse(messages.Ok.userText).evidence.length, 2);}
   const suggestions = suggestionMessages([{citationKey: 'ev', anchorId: 'a', paperTitle: 'Paper', attachmentId: 'att', contentSha256: 'a'.repeat(64), pageIndex: 1n, pageLabel: '2', quoteExact: 'Quote', contextText: 'Context', relationKind: 'direct_quote'}], 'Goal', 'concept_suggestion_v1');
   assert.equal('Ok' in suggestions, true); assert.deepEqual(suggestionMessages([], 'Goal', 'unknown'), {Err: {kind: 'invalidInput', message: '建议候选类型不受支持'}});
+});
+
+test('analysis workflow preserves matrix scope and context gates', () => {
+  const draft = {projectId: 'project', matrixId: 'matrix', matrixRevision: 2n, viewKind: 'taxonomy', title: 'Title', scopeNote: 'Scope', inputs: []};
+  assert.deepEqual(matrixContext({kind: 'header', draft}), {kind: 'validated', rejection: null});
+  assert.deepEqual(matrixContext({kind: 'revision', matches: false}), {kind: 'validated', rejection: {kind: 'invalidInput', message: '证据矩阵版本已变化，请重新预览综合范围'}});
+  assert.deepEqual(matrixContext({kind: 'input', input: {objectKind: 'matrix_cell', objectId: 'cell', objectRevision: 1n, selectionReason: 'reason'}, priorCellIds: ['cell']}), {kind: 'validated', rejection: {kind: 'invalidInput', message: '多文献综合输入单元无效或重复'}});
 });
