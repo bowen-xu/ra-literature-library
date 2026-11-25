@@ -1,12 +1,13 @@
 import { notePageId, noteBlockId } from "@research-assistant/core/notes";
 import { decodeAgentReadingNoteContextPreview, decodeAgentNoteContextPreview, decodeAgentPaperContextPreview, type AgentNoteContextRequest, type AgentPaperContextPrepareRequest, type AgentPaperContextPreview, type AgentPaperContextRequest, type AgentReadingNoteContextRequest } from "@research-assistant/core/agent";
+import type {AgentNoteContextGateway, AgentPaperContextGateway, AgentReadingNoteContextGateway} from "@research-assistant/data/agent";
 import type { AppGateways } from "@research-assistant/workbench-preview/app-gateway-types";
 import { getNotesGateway } from "@research-assistant/workbench-preview/gateways-gateway";
 import { getLiteratureGateway } from "../../../../../src/public/literatureGateway.ts";
 import { getDoclingGateway } from "@research-assistant/workbench-preview/docling-gateway";
 import {hashPreviewBytes as writingDiffDemoHash} from "@research-assistant/workbench-preview/preview-assets";
 
-export function createMockResearchContexts(storage: Storage) {
+export function createMockResearchContexts(storage: Storage): {readonly note: AgentNoteContextGateway; readonly reading: AgentReadingNoteContextGateway; readonly paper: AgentPaperContextGateway} {
   const papers = new Map<string, AgentPaperContextPreview>(JSON.parse(storage.getItem("paper-contexts") ?? "[]") as [string, AgentPaperContextPreview][]);
   const note: AppGateways["agentNoteContextGateway"] = { preview: async (request: AgentNoteContextRequest) => {
     const snapshot = await getNotesGateway().loadDocument(notePageId(request.pageId));
