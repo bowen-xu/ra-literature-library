@@ -96,7 +96,7 @@ export class FileBackedCatalogRuntime {
     const value = await this.readJson<unknown>(input);
     let result: unknown;
     try {
-      const dispatched = dispatchCatalog({operation, input: value});
+      const dispatched = dispatchCatalog({operation, input: dispatchInput(operation, value)});
       result = catalogOutput(dispatched.operation, dispatched.input, dispatched.result);
     } catch (cause) {throw new CatalogRuntimeError('dispatch', cause instanceof Error ? cause.message : String(cause));}
     let resultBytes: Uint8Array;
@@ -114,6 +114,39 @@ export class FileBackedCatalogRuntime {
     return resolved;
   }
 }
+
+/** The wire `CatalogInput` is a tagged envelope.  The pure backend dispatcher
+ * intentionally consumes the operation payload itself, so unwrap that envelope
+ * only at this host boundary.  Keeping this adapter here preserves the backend
+ * functions' direct test and reuse contract while matching the Core protocol. */
+function dispatchInput(operation: string, value: unknown): unknown {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return value;
+  const envelope = value as Record<string, unknown>;
+  // The unit-tested backend dispatcher also accepts the already-unwrapped
+  // payload.  Only apply the wire adapter when the tagged kind identifies the
+  // value as a CatalogInput envelope; otherwise preserve that direct payload.
+  if (envelope.kind !== operation) return value;
+  switch (operation) {
+    case 'plan': return fieldOrValue(envelope, 'request');
+    case 'select': return fieldOrValue(envelope, 'selection');
+    case 'readNalQueries': return fieldOrValue(envelope, 'row');
+    case 'prepareNalQuerySave': return fieldOrValue(envelope, 'content');
+    case 'prepareNalBootstrapProbes': return fieldOrValue(envelope, 'source');
+    case 'validateNalAnnotation': return fieldOrValue(envelope, 'request');
+    case 'prepareLiteratureLifecycle': return fieldOrValue(envelope, 'request');
+    case 'projectDuplicateCandidates':
+    case 'projectMergeOperations': return envelope.rows;
+    case 'preparePdfImportHeader': return {candidates: envelope.candidates};
+    case 'decodePdfImportCandidate': return {rawInput: envelope.rawInput};
+    case 'prepareTrashCleanup': return {};
+    default:
+      if (Object.hasOwn(envelope, 'input')) return envelope.input;
+      if (Object.hasOwn(envelope, 'request')) return envelope.request;
+      return envelope;
+  }
+}
+
+function fieldOrValue(envelope: Record<string, unknown>, field: string): unknown {return Object.hasOwn(envelope, field) ? envelope[field] : envelope;}
 
 function digest(bytes: Uint8Array): string {return createHash('sha256').update(bytes).digest('hex');}
 export function newCatalogRequestIdentity(): {readonly instanceId: string; readonly requestId: string} {return {instanceId: randomUUID(), requestId: randomUUID()};}

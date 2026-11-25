@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {mkdtemp, readFile, writeFile} from 'node:fs/promises';
+import {mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {createHash, randomUUID} from 'node:crypto';
@@ -41,6 +41,29 @@ test('catalog output serialization retains BigInt wire values', () => {
   const roundTrip = CatalogOutputSerde.decode(CatalogOutputSerde.encode(output as Parameters<typeof CatalogOutputSerde.encode>[0]));
   const decoded = roundTrip as {readonly kind: string; readonly outcome: {readonly result?: {readonly job?: {readonly totalCount?: bigint}}}};
   assert.equal(decoded.kind, 'importJobsProjection'); assert.equal(decoded.outcome.result?.job?.totalCount, 2n);
+});
+
+test('file-backed catalog runtime unwraps Core catalog envelopes before dispatch', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'literature-catalog-'));
+  const packageKey = 'a'.repeat(64), instanceId = randomUUID(), requestId = randomUUID();
+  const input = {kind: 'prepareSave', input: {
+    doi: {display: '10.1000/synthetic', normalized: '10.1000/synthetic'},
+    draft: {id: null, itemType: 'journalArticle', title: 'Envelope save', abstractText: '', issuedYear: 2026,
+      containerTitle: '', conferenceName: '', proceedingsTitle: '', place: '', volume: '', issue: '', pages: '', doi: '10.1000/synthetic',
+      url: '', language: 'en', bibtexKey: 'envelope', rawBibtex: null, creators: [], tags: [], sourceKind: 'electron-test'},
+  }};
+  const bytes = Buffer.from(JSON.stringify(input));
+  await writeFile(path.join(root, `catalog-input-${requestId}.json`), bytes);
+  const runtime = new FileBackedCatalogRuntime(root);
+  const result = await runtime.dispatch('prepareSave', {
+    relativeHandle: `catalog-input-${requestId}.json`, byteSize: bytes.byteLength, sha256: createHash('sha256').update(bytes).digest('hex'),
+    packageKey, instanceId, requestId,
+  }, {relativeHandle: `catalog-result-${requestId}.json`, byteSize: 1, sha256: '0'.repeat(64), packageKey, instanceId, requestId});
+  assert.ok(result.byteSize > 0);
+  const output = CatalogOutputSerde.decode(await readFile(path.join(root, result.relativeHandle)));
+  assert.equal(output.kind, 'savePlan');
+  if (output.kind === 'savePlan') assert.equal(output.outcome.kind, 'planned');
+  await rm(root, {recursive: true, force: true});
 });
 
 test('file-backed catalog runtime rejects path traversal and corrupted input', async () => {
