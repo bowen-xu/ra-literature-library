@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {createHash, randomUUID} from 'node:crypto';
 import {FileBackedCatalogRuntime, CatalogRuntimeError, catalogOutput, createFileBackedCatalogHandler} from './catalog-runtime.mts';
-import {CatalogOutputSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/src/catalog/output.ts';
+import {CatalogOutputSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/catalog/output.js';
 
 const ref = (handle: string, input: string, packageKey: string, instanceId: string, requestId: string) => ({relativeHandle: handle, byteSize: Buffer.byteLength(input), sha256: createHash('sha256').update(input).digest('hex'), packageKey, instanceId, requestId});
 

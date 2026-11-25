@@ -3,8 +3,8 @@
 import {createHash, randomUUID} from 'node:crypto';
 import {readFile, writeFile} from 'node:fs/promises';
 import path from 'node:path';
-import {CatalogOutputSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/src/catalog/output.ts';
-import type {CatalogOutput} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/src/catalog/output.ts';
+import {CatalogOutputSerde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/catalog/output.js';
+import type {CatalogOutput} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/catalog/output.js';
 import {dispatchCatalog} from '../../backend/src/catalog-dispatch.mts';
 import {catalogResultHandle, type SnapshotRef} from '../../backend/src/literature-trace-protocol.mts';
 import type {CatalogOperation} from '../../backend/src/catalog-protocol.mts';
