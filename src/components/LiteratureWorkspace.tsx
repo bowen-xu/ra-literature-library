@@ -455,8 +455,11 @@ export function LiteratureWorkspace({ active = true, navigationTabId, onNavigate
   }, [gateway]);
 
   useEffect(() => {
-    void refreshDuplicates();
-    void refreshMergeHistory();
+    let active = true;
+    const report = (reason: unknown): void => { if (active) setError(reason instanceof Error ? reason.message : String(reason)); };
+    void refreshDuplicates().catch(report);
+    void refreshMergeHistory().catch(report);
+    return () => { active = false; };
   }, []);
 
   const fileDrop = useLiteratureFileDrop({
