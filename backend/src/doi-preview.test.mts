@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {decideDoiPreview} from './doi-preview.mts';
-import {DOI_ACCEPT, DOI_RESPONSE_LIMIT, HTML_RESPONSE_LIMIT} from './doi-metadata.mts';
+import {DOI_ACCEPT, DOI_RESPONSE_LIMIT, HTML_RESPONSE_LIMIT, finishDoi, prepareDoi, resolverError} from './doi-metadata.mts';
+import type {DoiHttpErrorV1} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/src/doi-metadata.js';
 
 const doi = '10.1000/example';
 const body = (body: string, finalHttps = true) => ({Ok: {contentType: 'application/json', body, finalHttps}});
@@ -38,4 +39,40 @@ test('book sections request publisher enrichment once and retain embedded confer
 test('resolver errors retain connector prefix', () => {
   const result = decideDoiPreview({kind: 'translate', normalizedDoi: doi, resolver: {Err: {kind: 'status', status: 503, cause: 'safe status'}}, publisher: null});
   assert.deepEqual(result, {status: 'rejected', code: 'connector_error', message: 'DOI 元数据请求失败：DOI resolver 返回错误：safe status'});
+});
+
+test('DOI publisher state follows the original required and unsolicited outcomes', () => {
+  const chapter = prepareDoi(doi, 'application/json', JSON.stringify({type: 'book-chapter', title: 'Chapter'}));
+  assert.throws(() => finishDoi(chapter, null), /DOI 出版商补充结果与准备状态不符/u);
+  const journal = prepareDoi(doi, 'application/json', JSON.stringify({type: 'journal-article', title: 'Journal'}));
+  assert.throws(() => finishDoi(journal, {kind: 'html', body: '', finalHttps: true}), /DOI 出版商补充结果与准备状态不符/u);
+});
+
+test('DOI fallback title and insecure publisher preserve warning order and raw envelope', () => {
+  const prepared = prepareDoi(doi, 'not-a-dispatch-rule', JSON.stringify({type: 'unrecognized', title: ''}));
+  const result = finishDoi(prepared, {kind: 'html', body: "<meta name='citation_conference_title' content='Ignored'>", finalHttps: false});
+  assert.equal(result.draft.title, doi);
+  assert.deepEqual(result.warnings, ['出版商页面不是 HTTPS，已保留 DOI 基础元数据', '文献类型缺少明确会议证据，请人工确认']);
+  const raw = JSON.parse(result.rawPayload) as Record<string, unknown>;
+  assert.equal(raw.adapter, 'csl-json'); assert.equal(raw.contentType, 'not-a-dispatch-rule'); assert.equal(raw.doiResponse, JSON.stringify({type: 'unrecognized', title: ''}));
+  assert.deepEqual(raw.embeddedMetadata, {}); assert.deepEqual(raw.typeEvidence, []);
+});
+
+test('DOI publisher enrichment preserves base response and evidence', () => {
+  const prepared = prepareDoi(doi, 'application/json', JSON.stringify({type: 'book-chapter', title: 'Chapter'}));
+  const result = finishDoi(prepared, {kind: 'html', body: "<meta name='citation_conference_title' content='Conference &amp; Workshop'><meta name='citation_inbook_title' content='Proceedings'><meta name='citation_conference_location' content='Paris'>", finalHttps: true});
+  assert.equal(result.draft.itemType, 'conferencePaper'); assert.equal(result.draft.conferenceName, 'Conference & Workshop'); assert.equal(result.draft.proceedingsTitle, 'Proceedings'); assert.equal(result.draft.place, 'Paris');
+  const raw = JSON.parse(result.rawPayload) as Record<string, any>; assert.equal(raw.doiResponse, JSON.stringify({type: 'book-chapter', title: 'Chapter'})); assert.deepEqual(raw.typeEvidence, []);
+});
+
+test('DOI resolver error categories retain request and parse labels', () => {
+  const cases: readonly [DoiHttpErrorV1, string][] = [
+    [{kind: 'send', cause: 'send failed'}, '无法连接 DOI resolver：send failed'],
+    [{kind: 'notFound'}, '没有找到 DOI 元数据，请检查 DOI 是否正确'],
+    [{kind: 'status', status: 503, cause: 'status failed'}, 'DOI resolver 返回错误：status failed'],
+    [{kind: 'tooLarge', status: 200}, 'DOI resolver 响应超过大小限制'],
+    [{kind: 'read', status: 200, cause: 'body failed'}, '无法读取DOI resolver 响应：body failed'],
+    [{kind: 'utf8', status: 200, cause: 'invalid utf8'}, 'DOI resolver 响应不是 UTF-8：invalid utf8'],
+  ];
+  for (const [error, message] of cases) assert.equal(resolverError(error).message, message);
 });
