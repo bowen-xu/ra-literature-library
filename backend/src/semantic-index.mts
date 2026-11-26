@@ -1,5 +1,8 @@
 /** Semantic-index control decisions migrated from native/semantic_index.rs. */
 
+import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
+import {IndexDecisionV1Serde, IndexInputV1Serde, type IndexDecisionV1, type IndexWireInputV1, type IndexWireOutcomeV1} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/semantic-index/rules.js';
+
 export interface SemanticIndexSpaceStatus {readonly failedCount: bigint; readonly staleCount: bigint}
 export interface EmbeddingJobSummary {readonly status: string; readonly [key: string]: unknown}
 export interface ReconciliationRecord {readonly inputSha256: string; readonly status: string; readonly [key: string]: unknown}
@@ -48,4 +51,14 @@ export function decideSemanticIndex(input: SemanticIndexInput): SemanticIndexDec
       return {kind: 'reconcile', action: {kind: 'missing', count_repaired: markSemanticIndexStale(input.record.status)}};
     }
   }
+}
+
+/** Encode the finite CBOR rule boundary used by the native host protocol. */
+export function decideSemanticIndexWire(input: IndexWireInputV1): IndexWireOutcomeV1 {
+  const decoded = decodePayload(input.cborBase64, IndexInputV1Serde);
+  // The public SDK serde and this backend's narrow decision types are the same
+  // wire contract but intentionally have separate local declarations. The
+  // serde has already performed the runtime validation at this boundary.
+  const decision = decideSemanticIndex(decoded as unknown as SemanticIndexInput);
+  return {input, decisionCborBase64: encodePayload(decision as unknown as IndexDecisionV1, IndexDecisionV1Serde)};
 }

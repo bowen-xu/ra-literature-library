@@ -17,7 +17,7 @@ import {prepareMetadata} from './metadata.mts';
 import {prepareReadingUnit, type ReadingUnitRequest} from './reading-units.mts';
 import {projectContextMetadata, type ContextMetadataInput} from './context-metadata.mts';
 import {decideDerivedView, type DerivedViewInput} from './derived-view.mts';
-import {decideSemanticIndex, type SemanticIndexInput} from './semantic-index.mts';
+import {decideSemanticIndex, decideSemanticIndexWire, type SemanticIndexInput} from './semantic-index.mts';
 import {finishDuplicateDecision, prepareDuplicateDecision, prepareDuplicateMerge, type DuplicateDecisionRequest, type FinishDuplicateDecisionInput, type MergePrepareInput} from './duplicate-decisions.mts';
 import {decodePdfImportCandidate, preparePdfImportHeader, type PdfImportCandidate} from './pdf-import.mts';
 import {preparePaperConfirmation, type PaperConfirmationInput} from './paper-confirmation.mts';
@@ -87,7 +87,11 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
     case 'prepareReadingUnit': result = prepareReadingUnit(request.input as ReadingUnitRequest); break;
     case 'projectContextMetadata': result = projectContextMetadata(request.input as ContextMetadataInput); break;
     case 'decideDerivedView': result = decideDerivedView(request.input as DerivedViewInput); break;
-    case 'prepareSemanticIndex': result = decideSemanticIndex(request.input as SemanticIndexInput); break;
+    case 'prepareSemanticIndex': {
+      const input = request.input as SemanticIndexInput | {readonly cborBase64: string};
+      result = 'cborBase64' in input ? decideSemanticIndexWire(input) : decideSemanticIndex(input);
+      break;
+    }
     case 'prepareDuplicateDecision': result = prepareDuplicateDecision(request.input as DuplicateDecisionRequest); break;
     case 'finishDuplicateDecision': result = finishDuplicateDecision(request.input as FinishDuplicateDecisionInput); break;
     case 'prepareDuplicateMerge': result = prepareDuplicateMerge(request.input as MergePrepareInput); break;

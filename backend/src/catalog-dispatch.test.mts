@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
+import {IndexDecisionV1Serde, IndexInputV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/semantic-index/rules.js';
 import {dispatchCatalog} from './catalog-dispatch.mts';
 
 test('catalog dispatcher routes migrated operations and echoes the input', () => {
@@ -39,4 +41,12 @@ test('catalog dispatcher rejects unknown and not-yet-migrated operations explici
   assert.deepEqual(importJobs.result, {status: 'success', result: {kind: 'done'}});
   const probes = dispatchCatalog({operation: 'prepareNalBootstrapProbes', input: {legacyImported: {state: 'available', value: false}, collections: {state: 'available', value: []}, relationTypes: {state: 'skipped'}, relatedFieldUsed: {state: 'skipped'}, relations: {state: 'skipped'}, memberships: {state: 'skipped'}, assignments: {state: 'skipped'}, repairVersion: {state: 'available', value: 1n}, repairRecords: {state: 'skipped'}, configuredEmbedding: {state: 'skipped'}}});
   assert.deepEqual((probes.result as any).concepts, []);
+});
+
+test('catalog dispatcher preserves the semantic-index CBOR wire envelope', () => {
+  const cborBase64 = encodePayload({stage: 'status' as const, spaces: []}, IndexInputV1Serde);
+  const result = dispatchCatalog({operation: 'prepareSemanticIndex', input: {cborBase64}});
+  const outcome = result.result as {input: {cborBase64: string}; decisionCborBase64: string};
+  assert.equal(outcome.input.cborBase64, cborBase64);
+  assert.deepEqual(decodePayload(outcome.decisionCborBase64, IndexDecisionV1Serde), {kind: 'flag', value: false});
 });
