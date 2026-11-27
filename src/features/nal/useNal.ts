@@ -10,7 +10,7 @@ function vocabularyFor(state: NalState, papers: readonly LiteratureItem[]): read
   return [...state.concepts.map(c=>({atom:{kind:"concept" as const,id:c.id},label:c.label})),
     ...papers.map(p=>({atom:{kind:"paper" as const,id:p.id},label:p.title,paperCitation:nalPaperCitation(p)}))];
 }
-export function useNal(items: readonly LiteratureItem[]) {
+export function useNal(items: readonly LiteratureItem[], catalogReady = true) {
   const [state,setState]=useState(emptyNalState),[query,setConditions]=useState<readonly NalQueryBlock[]>(),[ready,setReady]=useState(false),[busy,setBusy]=useState(false);
   const [catalog,setCatalog]=useState<readonly LiteratureItem[]>([]),[projection,setProjection]=useState<NalQueryCollections>();
   const [selectedCollectionId,setSelectedCollectionId]=useState<string>();
@@ -29,9 +29,12 @@ export function useNal(items: readonly LiteratureItem[]) {
       return false;
     } catch(e){if(mounted.current && request===generation.current){setReady(false);notify.error(e instanceof Error ? e.message : typeof e === "string" ? e : "关系读取失败");}return false;}
   },[]);
-  useEffect(()=>{mounted.current=true;void refresh();return()=>{mounted.current=false;generation.current++;};},[refresh]);
-  useEffect(()=>{void refresh();},[items,refresh]);
-  useEffect(()=>{const update=()=>void refresh();window.addEventListener("focus",update);window.addEventListener("storage",update);return()=>{window.removeEventListener("focus",update);window.removeEventListener("storage",update);};},[refresh]);
+  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;generation.current++;};},[]);
+  // Wait for the library's first catalog snapshot. This keeps the startup
+  // relation read behind the primary list and leaves the native host available
+  // for a browser capture arriving while the workspace is becoming ready.
+  useEffect(()=>{if(catalogReady)void refresh();},[items,catalogReady,refresh]);
+  useEffect(()=>{if(!catalogReady)return;const update=()=>void refresh();window.addEventListener("focus",update);window.addEventListener("storage",update);return()=>{window.removeEventListener("focus",update);window.removeEventListener("storage",update);};},[catalogReady,refresh]);
   const mutate=useCallback(async(mutation:NalMutation,revision:number)=>{
     if(locked.current)return false;locked.current=true;setBusy(true);generation.current++;
     try{

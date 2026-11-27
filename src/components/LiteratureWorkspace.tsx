@@ -184,7 +184,8 @@ export function LiteratureWorkspace({ active = true, navigationTabId, onNavigate
   const gateway = useMemo(() => getLiteratureGateway(), []);
   const detailLayout = useLiteratureDetailLayout();
   const [items, setItems] = useState<readonly LiteratureItem[]>([]);
-  const relations = useNal(items);
+  const [loading, setLoading] = useState(true);
+  const relations = useNal(items, !loading);
   const openAnnotation = useNalAnnotation(relations);
   const [relationSidebarOpen, setRelationSidebarOpen] = useState(() => getAppStorage().getItem("research-assistant:relation-sidebar") !== "closed");
   const [relationItems, setRelationItems] = useState<readonly string[]>();
@@ -200,7 +201,6 @@ export function LiteratureWorkspace({ active = true, navigationTabId, onNavigate
   const [manual, setManual] = useState<LiteratureDraft>(emptyLiteratureDraft());
   const [manualCreatorInput, setManualCreatorInput] = useState(() => createLiteratureCreatorInput([]));
   const [style, setStyle] = useState<CitationStyle>("nature");
-  const [loading, setLoading] = useState(true);
   const setSessionWarning = useNotificationSetter("warning");
   const { registry: readerRegistry, setRegistry: setReaderRegistry, ready: sessionsReady } = useLibrarySessions({
     gateway, onWarning: setSessionWarning,
@@ -455,12 +455,13 @@ export function LiteratureWorkspace({ active = true, navigationTabId, onNavigate
   }, [gateway]);
 
   useEffect(() => {
+    if (loading) return;
     let active = true;
     const report = (reason: unknown): void => { if (active) setError(reason instanceof Error ? reason.message : String(reason)); };
     void refreshDuplicates().catch(report);
     void refreshMergeHistory().catch(report);
     return () => { active = false; };
-  }, []);
+  }, [loading]);
 
   const fileDrop = useLiteratureFileDrop({
     enabled: active && sessionsReady && activeTabId === LIBRARY_TAB_ID,
