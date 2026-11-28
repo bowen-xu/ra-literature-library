@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {projectAnalysisHistory} from './analysis-history.mts';
+import {projectAnalysisHistory, projectAnalysisHistoryWire} from './analysis-history.mts';
+import {decodePayload, encodePayload} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/paper-context-wire/codec.js';
+import {HistoryInputV1Serde, HistoryResultV1Serde} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-history.js';
 
 const capture = {row: {id: 'workflow', conversationId: 'not-uuid', paperId: 'paper', contextSnapshotId: null, status: 'succeeded', providerId: 'provider', modelId: 'model', reasoningEffort: null, promptSetVersion: 'v1', activeTurnKind: null, revision: 2, supersedesWorkflowId: null, createdAt: 'created', updatedAt: 'updated', completedAt: 'done'}, turns: [{row: {id: 'turn', workflowId: 'workflow', ordinal: 0, kind: 'paper_overview', status: 'succeeded', candidateId: null, createdAt: 'created', finishedAt: 'done'}, attempts: [{id: 'attempt', turnId: 'turn', sharedConversationId: 'not-uuid', attempt: 1, status: 'succeeded', providerId: 'provider', modelId: 'model', createdAt: 'created'}]}]};
 
@@ -13,4 +15,11 @@ test('analysis history projects rows and keeps invalid UUID-like values absent',
 test('analysis history preserves get-not-found versus list absence', () => {
   assert.deepEqual(projectAnalysisHistory({request: {kind: 'get'}, workflow: null}), {status: 'rejected', error: 'not_found'});
   assert.deepEqual(projectAnalysisHistory({request: {kind: 'list'}, workflow: null}), {status: 'ready', workflow: null});
+});
+
+test('analysis history projects the Core CBOR wire boundary', () => {
+  const input = {cborBase64: encodePayload({request: {kind: 'latest', paperId: 'paper'}, workflow: null}, HistoryInputV1Serde)};
+  const output = projectAnalysisHistoryWire(input);
+  assert.equal(output.input.cborBase64, input.cborBase64);
+  assert.deepEqual(decodePayload(output.resultCborBase64, HistoryResultV1Serde), {Ok: null});
 });

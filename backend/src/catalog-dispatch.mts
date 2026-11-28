@@ -24,7 +24,8 @@ import {preparePaperConfirmation, type PaperConfirmationInput} from './paper-con
 import {prepareAttachment, type AttachmentInput} from './attachments.mts';
 import {projectReadingHistory, type ReadingHistoryInput} from './reading-history.mts';
 import {prepareConcept, type ConceptRequest} from './concepts.mts';
-import {projectAnalysisHistory, type AnalysisHistoryInput} from './analysis-history.mts';
+import {projectAnalysisHistory, projectAnalysisHistoryWire, type AnalysisHistoryInput} from './analysis-history.mts';
+import type {HistoryWireInputV1} from '../../../../ra-workbench-sdk/packages/workbench-backend-sdk/lib/analysis-history.js';
 import {validateStructured, type StructuredValidationInput} from './structured-validation.mts';
 import {validateEditableTemplate, type EditableTemplateInput} from './editable-template.mts';
 import {selectUnreviewedFields} from './review-selection.mts';
@@ -101,7 +102,11 @@ export function dispatchCatalog(request: CatalogDispatchRequest): CatalogDispatc
     case 'prepareLiteratureAttachment': result = prepareAttachment(request.input as AttachmentInput); break;
     case 'projectReadingHistory': result = projectReadingHistory(request.input as ReadingHistoryInput); break;
     case 'prepareResearchConcept': result = prepareConcept(request.input as ConceptRequest); break;
-    case 'projectAnalysisHistory': result = projectAnalysisHistory(request.input as AnalysisHistoryInput); break;
+    case 'projectAnalysisHistory': {
+      const input = request.input as AnalysisHistoryInput | HistoryWireInputV1;
+      result = 'cborBase64' in input ? projectAnalysisHistoryWire(input) : projectAnalysisHistory(input);
+      break;
+    }
     case 'validateStructured': result = validateStructured(request.input as StructuredValidationInput); break;
     case 'selectUnreviewedFields': {const input = request.input as {readonly resourceId: string; readonly resourceRevision: number; readonly pendingFieldIds: readonly string[]; readonly protectedFieldIds: readonly string[]; readonly reviewedFieldIds: readonly string[]}; result = {input, selectedFieldIds: selectUnreviewedFields(input.pendingFieldIds, input.protectedFieldIds, input.reviewedFieldIds)}; break;}
     case 'validateEditableTemplate': result = {input: request.input, decision: validateEditableTemplate(request.input as EditableTemplateInput)}; break;
